@@ -7,14 +7,21 @@
       <div class="bawah">
         <h2>Masuk Ke Smartkartika</h2>
         <div class="input-container">
-          <label for="password-input" class="input-label">Masukkan kode</label>
+          <label for="username-input" class="input-label">Username</label>
+          <input
+            id="username-input"
+            v-model="username"
+            type="username"
+            class="input-box"
+          />
+          <label for="password-input" class="input-label">Kode</label>
           <input
             id="password-input"
             v-model="password"
             type="password"
             class="input-box"
           />
-          <a href="#" class="forgot-password">Lupa kode role?</a>
+          <!-- <a href="#" class="forgot-password">Lupa kode role?</a> -->
         </div>
 
         <button @click="handleLogin" class="login-button">Masuk</button>
