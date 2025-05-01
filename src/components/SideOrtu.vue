@@ -18,14 +18,14 @@
         </template>
 
         <template v-else>
-          <div class="sidebar-item" @click="goTo('/comment')">
+          <div class="sidebar-item" @click="goTo('/profilp')">
+            <div class="sidebar-text">Profil</div>
+          </div>
+          <div class="sidebar-item" @click="goTo('/commentp')">
             <div class="sidebar-text">Komentar</div>
           </div>
-          <div class="sidebar-item" @click="goTo('/berita')">
-            <div class="sidebar-text">Berita</div>
-          </div>
-          <div class="sidebar-item" @click="goTo('/laporan')">
-            <div class="sidebar-text">Laporan</div>
+          <div class="sidebar-item" @click="goTo('/rapor')">
+            <div class="sidebar-text">Rapor</div>
           </div>
           <div class="sidebar-item-logout" @click="goTo('/logout')">
             <div class="sidebar-text">Logout</div>
@@ -79,7 +79,7 @@ function goTo(route) {
 .sidebar {
   width: 200px;
   height: 100%;
-  background-color: #fff;
+  background-color: #2c3930;
   display: flex;
   flex-direction: column;
   box-shadow: 2px 0px 5px rgba(0, 0, 0, 0.2);
@@ -90,7 +90,7 @@ function goTo(route) {
 
 .profile-header {
   padding: 10px;
-  background-color: #2f4036;
+  background-color: #a27b5c;
   display: flex;
   align-items: center;
   width: 100%;
@@ -128,7 +128,7 @@ function goTo(route) {
 }
 
 .sidebar-item {
-  background-color: #2f4036;
+  background-color: #a27b5c;
   display: flex;
   align-items: center;
   padding: 10px 30px;
@@ -138,7 +138,7 @@ function goTo(route) {
 }
 
 .sidebar-item-logout {
-  background-color: #2f4036;
+  background-color: #a27b5c;
   display: flex;
   align-items: center;
   padding: 10px 30px;
@@ -147,6 +147,9 @@ function goTo(route) {
   cursor: pointer;
 }
 
+.sidebar-item-logout .sidebar-text img {
+  color: #fff;
+}
 .sidebar-item:hover {
   background-color: #3b5546;
 }
@@ -155,27 +158,16 @@ function goTo(route) {
   background-color: #3b5546;
 }
 
-.icon-container {
-  width: 30px;
-  height: 30px;
-  margin-right: 10px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
 .icon {
-  width: 100%;
+  width: 25%;
   height: 100%;
+  margin: 0 auto;
+  filter: brightness(0) invert(1);
 }
 
 .sidebar-text {
   color: #ffffff;
   font-size: 16px;
   font-weight: bold;
-}
-
-.logout {
-  margin-top: auto;
 }
 </style>

@@ -5,7 +5,7 @@
       <button class="back-button" @click="goBack">
         <img src="@/assets/arrow-left.png" alt="Back" />
       </button>
-      <h1 class="parent-name">{{ teacherName }}</h1>
+      <h1 class="parent-name">{{ parentName }}</h1>
     </div>
 
     <!-- Chat Content -->
@@ -45,8 +45,8 @@ import { useRouter } from 'vue-router'
 
 const router = useRouter()
 
-// MODE: 'teacher'
-const mode = 'teacher' // Menetapkan mode ke 'teacher'
+// MODE: 'parent'
+const mode = 'parent' // Menetapkan mode ke 'parent'
 
 const parentName = 'Ananda Andi' // Nama siswa
 const teacherName = 'Bu Rina' // Nama guru
@@ -59,8 +59,8 @@ const messages = ref([
 const newMessage = ref('')
 const chatContent = ref(null)
 
-const headerBg = computed(() => (mode === 'teacher' ? '#2c3930' : '#A27B5C'))
-const inputBg = computed(() => (mode === 'teacher' ? '#2c3930' : '#A27B5C'))
+const headerBg = computed(() => (mode === 'parent' ? '#A27B5C' : '#2c3930'))
+const inputBg = computed(() => (mode === 'parent' ? '#A27B5C' : '#2c3930'))
 
 function sendMessage() {
   if (newMessage.value.trim() !== '') {
@@ -98,7 +98,7 @@ function scrollToBottom() {
 
 function getSenderLabel(sender) {
   if (sender === 'Anda') return 'Saya'
-  return mode === 'teacher' ? parentName : teacherName
+  return mode === 'parent' ? teacherName : parentName
 }
 
 function isSenderMe(sender) {
@@ -120,7 +120,7 @@ function isSenderMe(sender) {
   position: relative;
   color: white;
   padding: 12px;
-  background-color: #2c3930;
+  background-color: #a27b5c;
 }
 
 .back-button {
@@ -218,7 +218,7 @@ function isSenderMe(sender) {
 .chat-input {
   display: flex;
   padding: 1.5rem;
-  background-color: #2c3930;
+  background-color: #a27b5c;
   border-top: 1px solid #ccc;
 }
 

@@ -375,14 +375,13 @@ function confirmBack() {
   .form-upload {
     height: 100%;
     box-sizing: border-box;
-    min-height: calc(100vh - 60px);
+    min-height: calc(100vh - 10px);
     width: 100%;
     max-width: 800%;
-    padding: 1.5rem;
   }
   .title {
     text-align: start;
-    font-size: 2rem;
+    font-size: 1.5rem;
   }
 }
 </style>

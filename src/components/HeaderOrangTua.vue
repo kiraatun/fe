@@ -1,10 +1,10 @@
 <template>
   <header class="header">
     <!-- Tombol garis tiga hanya muncul di mobile -->
-    <button class="hamburger" @click="toggleSidebar" v-if="isMobile">☰</button>
+    <button class="hamburger" @click="toggleSidebar">☰</button>
 
     <SidebarTemplate
-      v-if="isMobile && showSidebar && !selectedMenu"
+      v-if="showSidebar && !selectedMenu"
       :isMobile="isMobile"
       :isLoggedIn="isLoggedIn"
       :userName="userName"
@@ -18,7 +18,7 @@
 
 <script setup>
 import { ref } from 'vue'
-import SidebarTemplate from '@/components/SidebarTemplate.vue'
+import SidebarTemplate from '@/components/SideOrtu.vue'
 
 defineProps({ isMobile: Boolean, isLoggedIn: Boolean })
 
@@ -48,6 +48,8 @@ const handleSelect = (menu) => {
   color: white;
   position: relative;
   margin-bottom: 0;
+  background:
+    linear-gradient(rgba(162, 123, 92, 0.8), rgba(162, 123, 92, 0.8)), url('@/assets/bg.png');
 }
 
 .hamburger {
@@ -71,9 +73,6 @@ const handleSelect = (menu) => {
 }
 
 @media (min-width: 769px) {
-  .header {
-    justify-content: flex-start;
-  }
   .app-name {
     font-size: 2.5rem;
     font-style: italic;

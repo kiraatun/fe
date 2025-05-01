@@ -1,6 +1,12 @@
 <template>
   <div class="dashboard">
     <!-- Header -->
+    <HeaderDashboard
+      v-if="(!isMobile && !selectedBerita) || (isMobile && !selectedBerita)"
+      :isMobile="isMobile"
+      :isLoggedIn="true"
+      @toggleSidebar="showSidebar = !showSidebar"
+    />
 
     <div v-if="selectedBerita" class="page-header">
       <div class="left">
@@ -14,24 +20,12 @@
       <div class="right"></div>
     </div>
 
-    <div v-if="!selectedBerita && isMobile" class="page-header">
-      <div class="left">
-        <button class="back-button" @click="goBackToDashboard">
-          <img src="@/assets/arrow-left.png" alt="kembali" />
-        </button>
-      </div>
-      <div class="center">
-        <h1 class="app-title">Berita Hari ini</h1>
-      </div>
-      <div class="right"></div>
-    </div>
-
     <!-- Main content -->
     <div class="main-content">
       <!-- Sidebar atau Back Button -->
       <div class="sidebar-area">
         <Sidebar
-          v-if="isMobile && showSidebar && !selectedBerita"
+          v-if="showSidebar && !selectedBerita"
           :isMobile="isMobile"
           :isLoggedIn="isLoggedIn"
           :userName="userName"
@@ -42,10 +36,15 @@
 
       <!-- Konten utama -->
       <div class="content-area">
-        <div v-if="!selectedBerita && !isMobile" class="greeting-section">
-          <p class="greeting-text">Selamat Datang, {{ userName }}</p>
+        <div v-if="!selectedBerita" class="greeting-section">
+          <div class="greeting-text">
+            <p>
+              Halo, <span class="user">{{ userName }}</span>
+            </p>
+            <p>Selamat Datang</p>
+          </div>
           <div class="berita-hari-ini">
-            <h3>Berita hari ini</h3>
+            <h3>Berita Utama</h3>
           </div>
         </div>
         <div v-if="!selectedBerita" class="berita-list">
@@ -88,13 +87,12 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import Sidebar from '@/components/SidebarTemplate.vue'
-import { useRouter } from 'vue-router'
+import Sidebar from '@/components/SideOrtu.vue'
+import HeaderDashboard from '@/components/HeaderOrangTua.vue'
 
 // States
 const beritaList = ref([])
 const selectedBerita = ref(null)
-const router = useRouter()
 
 const isMobile = ref(window.innerWidth <= 768)
 const showSidebar = ref(false)
@@ -142,10 +140,6 @@ onMounted(() => {
 window.addEventListener('resize', () => {
   isMobile.value = window.innerWidth <= 768
 })
-
-const goBackToDashboard = () => {
-  router.push('/dashboard')
-}
 </script>
 
 <style scoped>
@@ -157,11 +151,13 @@ const goBackToDashboard = () => {
 
 /* Header saat lihat detail berita */
 .page-header {
+  margin-bottom: 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 0.5rem;
   padding: 0.5rem;
+  background:
+    linear-gradient(rgba(162, 123, 92, 0.8), rgba(162, 123, 92, 0.8)), url('@/assets/bg.png');
 }
 
 .left,
@@ -210,44 +206,44 @@ const goBackToDashboard = () => {
   display: flex;
   flex-direction: column;
   background-color: #fff;
-  padding: 0;
-  padding: 0.5rem;
 }
 
 /* Welcome Section */
 .greeting-section {
   position: sticky;
-  top: 0; /* agar greeting tetap sticky di atas */
+  top: 0;
   background-color: #fff;
   z-index: 10;
-  padding: 1.5rem; /* beri padding pada greeting */
-  min-height: 100px; /* pastikan cukup tinggi */
+  min-height: 100px;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  border-bottom: 1px solid #ccc; /* bisa tambahkan border untuk efek */
+  border-bottom: 1px solid #ccc;
+  margin-top: 0;
 }
 
 .greeting-text {
-  font-size: 1.4rem;
-  font-weight: bold;
-  margin-bottom: 1.5rem;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
   color: #2c3930;
   margin-left: 0.8rem;
-  margin-top: 1.5rem;
+}
+.greeting-text p {
+  font-weight: bold;
+  color: #626262;
 }
 
-.berita-hari-ini {
-  margin-bottom: 1rem;
+.greeting-text .user {
+  font-weight: bold;
+  font-size: 1rem;
+  color: #2c3930;
 }
 
 .berita-hari-ini h3 {
-  font-size: 1.2rem;
+  font-size: 0.8rem;
   font-weight: bold;
   color: #2c3930;
-  margin: 0;
-  text-decoration: underline;
-  margin-left: 11.5rem;
+  margin-left: 1rem;
 }
 
 /* Berita List */
@@ -258,8 +254,8 @@ const goBackToDashboard = () => {
 }
 
 .berita-item {
-  width: 80%;
-  background: #2c3930;
+  width: 65%;
+  background: #a27b5c;
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -271,7 +267,7 @@ const goBackToDashboard = () => {
 
 .berita-image {
   width: 100%;
-  height: 180px;
+  height: 140px;
   object-fit: cover;
 }
 
@@ -296,21 +292,25 @@ const goBackToDashboard = () => {
   display: flex;
   flex-direction: column;
   gap: 24px;
-  padding: 2rem;
+  padding: 1rem;
+  height: 100%;
   height: 100%;
 }
 
 /* Kartu berita */
 .berita-card {
-  background-color: #2c3930;
+  background-color: #a27b5c;
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  width: 70%;
+  margin: 0 auto;
+  margin-top: 1rem;
 }
 
 .detail-image {
   width: 100%;
-  height: 250px;
+  height: 150px;
   object-fit: cover;
 }
 
@@ -319,7 +319,7 @@ const goBackToDashboard = () => {
 }
 
 .detail-title {
-  font-size: 20px;
+  font-size: 15px;
   font-weight: bold;
   color: #ffffff;
   margin-bottom: 8px;
@@ -336,11 +336,10 @@ const goBackToDashboard = () => {
 }
 
 .description-label {
-  font-size: 16px;
+  font-size: 12px;
   color: #000;
   margin-bottom: 8px;
   display: block;
-  text-transform: lowercase;
 }
 
 .description-box {
@@ -348,44 +347,16 @@ const goBackToDashboard = () => {
   color: #333;
   padding: 16px;
   border-radius: 8px;
-  font-size: 14px;
+  font-size: 10px;
   line-height: 1.5;
 }
 
-/* Desktop responsive */
-@media (min-width: 768px) {
-  .dashboard {
-    height: 100%;
-    min-height: calc(100vh - 84px);
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-  }
+@media (min-width: 769px) {
   .berita-item {
-    width: 60%;
-    margin: 0 auto;
+    width: 50%;
   }
-  .detail-image {
-    height: 100%;
-  }
-  .main-content {
-    height: 100%;
-    box-sizing: border-box;
-    min-height: calc(100vh - 8px);
-    width: 100%;
-    max-width: 800%;
-    padding: 0;
-  }
-  .page-header {
-    background:
-      linear-gradient(rgba(44, 57, 48, 0.93), rgba(44, 57, 48, 0.93)), url('@/assets/bg.png');
-    background-size: cover;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 0.5rem;
-    padding: 1rem;
-    height: 100%;
+  .berita-card {
+    width: 50%;
   }
 }
 </style>

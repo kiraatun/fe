@@ -4,13 +4,14 @@
     <div class="page-header">
       <div class="left">
         <button class="back-button" @click="goBack">
-          <img src="@/assets/arrow-left.png" alt="Kembali">
+          <img src="@/assets/arrow-left.png" alt="Kembali" />
         </button>
       </div>
       <div class="center">
         <h1 class="app-title">Smartkartika</h1>
       </div>
-      <div class="right"></div> <!-- dummy agar kiri dan kanan seimbang -->
+      <div class="right"></div>
+      <!-- dummy agar kiri dan kanan seimbang -->
     </div>
 
     <!-- Form Container -->
@@ -18,28 +19,28 @@
       <h2 class="title">BUAT LAPORAN</h2>
 
       <!-- Pilih Kelas -->
-       <div class="form">
-         <div class="form-group">
-           <label for="kelas">Pilih Kelas</label>
-           <select id="kelas" v-model="selectedClass" @change="fetchStudents">
-             <option disabled value="">Kelas</option>
-             <option v-for="kelas in kelasList" :key="kelas.id" :value="kelas.id">
-               {{ kelas.name }}
-             </option>
-           </select>
-         </div>
+      <div class="form">
+        <div class="form-group">
+          <label for="kelas">Pilih Kelas</label>
+          <select id="kelas" v-model="selectedClass" @change="fetchStudents">
+            <option disabled value="">Kelas</option>
+            <option v-for="kelas in kelasList" :key="kelas.id" :value="kelas.id">
+              {{ kelas.name }}
+            </option>
+          </select>
+        </div>
 
-         <!-- Pilih Siswa -->
-         <div class="form-group">
-           <label for="siswa">Pilih Nama Siswa</label>
-           <select id="siswa" v-model="selectedStudent">
-             <option disabled value="">Nama Siswa</option>
-             <option v-for="siswa in siswaList" :key="siswa.id" :value="siswa.id">
-               {{ siswa.name }}
-             </option>
-           </select>
-         </div>
-       </div>
+        <!-- Pilih Siswa -->
+        <div class="form-group">
+          <label for="siswa">Pilih Nama Siswa</label>
+          <select id="siswa" v-model="selectedStudent">
+            <option disabled value="">Nama Siswa</option>
+            <option v-for="siswa in siswaList" :key="siswa.id" :value="siswa.id">
+              {{ siswa.name }}
+            </option>
+          </select>
+        </div>
+      </div>
 
       <!-- Upload File -->
       <div class="form-file">
@@ -47,7 +48,7 @@
 
         <label class="custom-file-upload" :class="{ 'file-selected': fileName }">
           <div class="upload-content">
-            <img src="@/assets/arrow-up-sm.png" alt="Upload Icon" class="upload-icon">
+            <img src="@/assets/arrow-up-sm.png" alt="Upload Icon" class="upload-icon" />
             <span class="upload-text">{{ fileName || 'Pilih File' }}</span>
           </div>
           <input type="file" @change="handleFile" accept="application/pdf" />
@@ -179,7 +180,6 @@ onMounted(() => {
 })
 </script>
 
-
 <style scoped>
 .page-wrapper {
   display: flex;
@@ -198,7 +198,9 @@ onMounted(() => {
   padding: 1.5rem 1rem;
 }
 
-.left, .center, .right {
+.left,
+.center,
+.right {
   flex: 1;
   display: flex;
   align-items: center;
@@ -213,7 +215,7 @@ onMounted(() => {
   justify-content: flex-end;
 }
 
-.back-button img{
+.back-button img {
   width: 24px;
   height: 24px;
   filter: brightness(0) invert(1);
@@ -230,8 +232,7 @@ onMounted(() => {
 .form {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-  margin-bottom: 1rem;
+  gap: 0.5rem;
 }
 
 .form-wrapper {
@@ -240,9 +241,9 @@ onMounted(() => {
   flex-direction: column;
   justify-content: space-between;
   background-color: #fff;
-  padding: 2rem;
+  padding: 1rem;
   border-radius: 20px 20px 0 0;
-  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   height: 100%;
   width: 100%;
   box-sizing: border-box;
@@ -256,7 +257,7 @@ onMounted(() => {
 }
 
 .form-group {
-  margin-bottom: 0,5rem;
+  margin-bottom: 0, 2rem;
 }
 
 .form-group label {
@@ -279,7 +280,6 @@ onMounted(() => {
   display: flex;
   justify-content: center;
   align-items: center;
-  font-weight: 400;
   margin-bottom: 1rem;
 }
 
@@ -295,7 +295,7 @@ onMounted(() => {
   font-weight: bold;
 }
 
-.custom-file-upload input[type="file"] {
+.custom-file-upload input[type='file'] {
   display: none;
 }
 
@@ -340,28 +340,29 @@ onMounted(() => {
   color: #1f3a2d;
 }
 
-@media(min-width: 768px) {
+@media (min-width: 768px) {
   .page-header {
     display: none;
   }
 
   .form {
     flex-direction: row;
+    margin-bottom: 0;
   }
 
   .page-wrapper {
     height: 100%;
     box-sizing: border-box;
-    min-height: calc(100vh - 60px);
+    min-height: calc(100vh - 90px);
     width: 100%;
     max-width: 800%;
     padding: 0;
+    margin-bottom: 0;
   }
 
   .title {
     text-align: start;
-    font-size: 2rem;
-    margin-bottom: 1rem;
+    font-size: 1.5rem;
   }
 
   .form-group {
@@ -369,26 +370,23 @@ onMounted(() => {
   }
 
   .form-group label {
-  font-weight: bold;
-  margin-bottom: 0.5rem;
-  display: block;
+    font-weight: bold;
+    display: block;
   }
 
   .form-group select {
-  width: 100%;
-  padding: 0.5rem;
-  border: 1px solid #ccc;
-  border-radius: 8px;
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
   }
 
   .form-file {
-    margin: 1rem 0;
     text-align: center;
   }
 
   .custom-file-upload {
     margin-top: 0;
-    padding: 2rem;
     border: 2px dashed #aaa;
     border-radius: 10px;
     background: #f0f0f0;
@@ -396,21 +394,28 @@ onMounted(() => {
     cursor: pointer;
     position: relative;
     margin: 0 auto;
+    width: 80%;
+    margin-bottom: 0;
+    padding: 0;
   }
 
-  .custom-file-upload input[type="file"]{
+  .custom-file-upload input[type='file'] {
     opacity: 0;
     position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     width: 100%;
     height: 100%;
     cursor: pointer;
+    margin-bottom: 0;
   }
 
   .upload-icon {
     display: block;
-    width: 40px;
-    height: 40px;
+    width: 30px;
+    height: 30px;
     margin-bottom: 0.5rem;
     margin: 0 auto;
   }
@@ -422,13 +427,8 @@ onMounted(() => {
   .form-file .file-note {
     display: none;
   }
-
-  .custom-file-upload {
-    position: relative;
-  }
-
   .upload-text::after {
-    content: "Unggah file berupa pdf (Maksimal 10Mb)";
+    content: 'Unggah file berupa pdf (Maksimal 10Mb)';
     display: block;
     font-size: 0.875rem;
     color: #666;
@@ -436,7 +436,10 @@ onMounted(() => {
   }
 
   .submit-button {
-    margin-bottom: 3.5rem;
+    width: 50%;
+    margin: 0 auto;
+    margin-bottom: 0;
+    padding: 0.5rem;
   }
 }
 </style>
