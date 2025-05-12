@@ -11,7 +11,6 @@
         <h1 class="app-title">Smartkartika</h1>
       </div>
       <div class="right"></div>
-      <!-- dummy agar kiri dan kanan seimbang -->
     </div>
 
     <!-- Form Container -->
@@ -48,13 +47,13 @@
 
         <label class="custom-file-upload" :class="{ 'file-selected': fileName }">
           <div class="upload-content">
-            <img src="@/assets/arrow-up-sm.png" alt="Upload Icon" class="upload-icon" />
+            <div class="icon">
+              <img src="@/assets/arrow-up-sm.png" alt="Upload Icon" class="upload-icon" />
+            </div>
             <span class="upload-text">{{ fileName || 'Pilih File' }}</span>
           </div>
           <input type="file" @change="handleFile" accept="application/pdf" />
         </label>
-
-        <small class="file-note">Unggah file berupa pdf (maksimal 10MB)</small>
       </div>
 
       <!-- Tombol Kirim -->
@@ -78,6 +77,8 @@
       :title="'LAPORAN BERHASIL DIKIRIM'"
       @close="showSuccess = false"
     />
+
+    <ModalPesan v-if="showError" :title="errorTitle" @close="showError = false" />
   </div>
 </template>
 
@@ -86,11 +87,10 @@ import { ref, onMounted } from 'vue'
 import axios from 'axios'
 import ModalKonfirmasi from '@/components/BlokPopup.vue'
 import ModalSukses from '@/components/MessagePopup.vue'
+import ModalPesan from '@/components/MessagePopup.vue'
 
-// --- Emit buat tombol back
 const emit = defineEmits(['back'])
 
-// --- State lokal
 const kelasList = ref([])
 const siswaList = ref([])
 const selectedClass = ref('')
@@ -99,8 +99,9 @@ const file = ref(null)
 const fileName = ref('')
 const showConfirm = ref(false)
 const showSuccess = ref(false)
+const showError = ref(false)
+const errorTitle = ref('')
 
-// --- Fungsi
 const fetchKelas = async () => {
   try {
     const response = await axios.get('/api/kelas')
@@ -120,21 +121,21 @@ const fetchStudents = async () => {
 }
 
 const handleFile = (event) => {
-  const uploadedFile = event.target.files[0]
-  if (uploadedFile && uploadedFile.size > 10 * 1024 * 1024) {
-    alert('Ukuran file melebihi 10MB!')
+  const uploaded = event.target.files[0]
+  if (uploaded && uploaded.size > 10 * 1024 * 1024) {
+    showErrorPopup('Ukuran File Tidak Valid')
     event.target.value = ''
     file.value = null
     fileName.value = ''
   } else {
-    file.value = uploadedFile
-    fileName.value = uploadedFile.name
+    file.value = uploaded
+    fileName.value = uploaded.name
   }
 }
 
 const confirmSubmit = () => {
   if (!selectedClass.value || !selectedStudent.value || !file.value) {
-    alert('Harap lengkapi semua data!')
+    showErrorPopup('Form Tidak Lengkap')
     return
   }
   showConfirm.value = true
@@ -157,7 +158,7 @@ const submitForm = async () => {
     showSuccess.value = true
     resetForm()
   } catch (error) {
-    alert('Gagal mengunggah file!')
+    showErrorPopup('Gagal Upload')
     console.error(error)
   }
 }
@@ -169,15 +170,17 @@ const resetForm = () => {
   fileName.value = ''
 }
 
-// --- Back ke dashboard menu
 const goBack = () => {
   emit('back')
 }
 
-// --- Lifecycle
 onMounted(() => {
   fetchKelas()
 })
+const showErrorPopup = (title) => {
+  errorTitle.value = title
+  showError.value = true
+}
 </script>
 
 <style scoped>
@@ -194,8 +197,8 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 1rem;
-  padding: 1.5rem 1rem;
+  background:
+    linear-gradient(rgba(44, 57, 48, 0.93), rgba(44, 57, 48, 0.93)), url('@/assets/bg.png');
 }
 
 .left,
@@ -215,10 +218,13 @@ onMounted(() => {
   justify-content: flex-end;
 }
 
-.back-button img {
-  width: 24px;
-  height: 24px;
-  filter: brightness(0) invert(1);
+.back-button {
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
 }
 
 .app-title {
@@ -232,7 +238,7 @@ onMounted(() => {
 .form {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  margin-bottom: 0;
 }
 
 .form-wrapper {
@@ -254,17 +260,14 @@ onMounted(() => {
   text-align: center;
   font-weight: bold;
   color: #1f3a2d;
-}
-
-.form-group {
-  margin-bottom: 0, 2rem;
+  font-size: 1.3rem;
 }
 
 .form-group label {
   color: #1f3a2d;
   display: block;
-  font-weight: 600;
-  margin-bottom: 0.5rem;
+  font-size: 0.8rem;
+  font-weight: bold;
 }
 
 .form-group select {
@@ -273,6 +276,7 @@ onMounted(() => {
   padding: 0.5rem;
   border: 1px solid #aaa;
   border-radius: 4px;
+  margin-bottom: 1rem;
 }
 
 .form-file label {
@@ -281,58 +285,75 @@ onMounted(() => {
   justify-content: center;
   align-items: center;
   margin-bottom: 1rem;
+  font-size: 0.8rem;
+}
+
+.upload-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .custom-file-upload {
-  color: #fff;
-  display: inline-block;
-  background-color: #7d726a;
-  padding: 0.75rem 1.5rem;
-  border-radius: 15px;
+  border: 2px dashed #aaa;
+  border-radius: 10px;
+  background: #f0f0f0;
+  color: #333;
   cursor: pointer;
-  text-align: center;
-  width: 100%;
-  font-weight: bold;
-}
-
-.custom-file-upload input[type='file'] {
-  display: none;
-}
-
-.custom-file-upload.file-selected {
-  background-color: #2c3930;
-  color: #fff;
-}
-
-.form-file small {
-  margin-top: 1rem;
-  color: #1f3a2d;
+  position: relative;
+  width: 80%;
+  height: 100px;
+  margin: 0 auto;
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-bottom: 1rem;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.custom-file-upload input[type='file'] {
+  opacity: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+  margin-bottom: 0;
+  margin: 0 atuo;
+}
+
+.upload-text::after {
+  content: 'Unggah file berupa pdf (Maksimal 10Mb)';
+  display: block;
+  font-size: 0.6rem;
+  color: #666;
+  margin-bottom: 0.5rem;
 }
 
 .submit-button {
-  width: 100%;
-  padding: 0.75rem;
+  width: 50%;
+  padding: 0.5rem;
   background-color: #7d726a;
   color: white;
-  border: none;
-  border-radius: 15px;
+  border-radius: 6px;
   cursor: pointer;
-  margin-bottom: 1rem;
+  margin: 0 auto;
+  margin-top: 0.5rem;
+  margin-bottom: 2rem;
+  border: none;
 }
 
 .submit-button:hover {
   background-color: #4d4d4d;
 }
 
-.upload-icon {
-  display: none;
-}
 .upload-text {
   text-align: center;
+  font-size: 0.7rem;
 }
 .file-note {
   margin-top: 1rem;
@@ -375,7 +396,7 @@ onMounted(() => {
   }
 
   .form-group select {
-    width: 100%;
+    width: 85%;
     padding: 0.5rem;
     border: 1px solid #ccc;
     border-radius: 8px;
@@ -385,60 +406,10 @@ onMounted(() => {
     text-align: center;
   }
 
-  .custom-file-upload {
-    margin-top: 0;
-    border: 2px dashed #aaa;
-    border-radius: 10px;
-    background: #f0f0f0;
-    color: #333;
-    cursor: pointer;
-    position: relative;
-    margin: 0 auto;
-    width: 80%;
-    margin-bottom: 0;
-    padding: 0;
-  }
-
-  .custom-file-upload input[type='file'] {
-    opacity: 0;
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    width: 100%;
-    height: 100%;
-    cursor: pointer;
-    margin-bottom: 0;
-  }
-
-  .upload-icon {
-    display: block;
-    width: 30px;
-    height: 30px;
-    margin-bottom: 0.5rem;
-    margin: 0 auto;
-  }
-
-  .upload-content {
-    gap: 0.5rem;
-  }
-
-  .form-file .file-note {
-    display: none;
-  }
-  .upload-text::after {
-    content: 'Unggah file berupa pdf (Maksimal 10Mb)';
-    display: block;
-    font-size: 0.875rem;
-    color: #666;
-    margin-top: 0.7rem;
-  }
-
   .submit-button {
-    width: 50%;
+    width: 40%;
     margin: 0 auto;
-    margin-bottom: 0;
+    margin-bottom: 2rem;
     padding: 0.5rem;
   }
 }

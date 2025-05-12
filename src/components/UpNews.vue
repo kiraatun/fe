@@ -14,20 +14,20 @@
     </div>
 
     <div class="form-upload">
-      <h2 class="title">Unggah Berita</h2>
+      <h2 class="title">UNGGAH BERITA</h2>
 
       <div class="upload-wrapper">
         <!-- Image Upload Area -->
         <div class="upload-area" @click="$refs.fileInput.click()">
           <div class="upload-box">
             <img v-if="previewImage" :src="previewImage" alt="Preview" class="preview-image" />
-            <div class="upload-texts">
+            <div v-else class="upload-texts">
+              <div class="icon">
+                <img src="@/assets/arrow-up-sm.png" alt="Up" />
+              </div>
               <p class="upload-instruction">Drop Your File</p>
               <p class="upload-note">(Maksimal 10mb)</p>
             </div>
-          </div>
-          <div class="add-files-button-wrapper">
-            <button class="add-files-button" @click="$refs.fileInput.click()">➕ Add files</button>
           </div>
           <input
             type="file"
@@ -38,6 +38,16 @@
           />
         </div>
         <!-- Tombol hijau Add Files -->
+      </div>
+      <!-- Judul Input -->
+      <div class="title-wrapper">
+        <label class="title-label">Judul Berita</label>
+        <input
+          v-model="title"
+          type="text"
+          placeholder="Masukkan judul berita"
+          class="title-input"
+        />
       </div>
 
       <!-- Text Area -->
@@ -85,6 +95,12 @@
       @close="showWarningFoto = false"
     />
 
+    <PopupJudul
+      v-if="showWarningTitle"
+      :title="'ISI JUDUL TERLEBIH DAHULU'"
+      @close="showWarningTitle = false"
+    />
+
     <PopupDeskripsi
       v-if="showWarningRincian"
       :title="'ISI RINCIAN KEGIATAN DAHULU'"
@@ -102,16 +118,19 @@ import PopupConfirmBack from '@/components/BlokPopup.vue'
 import PopupSuccess from '@/components/MessagePopup.vue'
 import PopupFoto from '@/components/MessagePopup.vue'
 import PopupDeskripsi from '@/components/MessagePopup.vue'
+import PopupJudul from '@/components/MessagePopup.vue'
 
 const previewImage = ref(null)
+const title = ref('')
 const description = ref('')
 const showConfirmUpload = ref(false)
 const showConfirmBack = ref(false)
 const showSuccess = ref(false)
 const showWarningFoto = ref(false)
 const showWarningRincian = ref(false)
-const router = useRouter()
+const showWarningTitle = ref(false) // Tambahan jika ingin popup judul kosong
 
+const router = useRouter()
 const emit = defineEmits(['back'])
 
 function handleFileUpload(event) {
@@ -126,12 +145,14 @@ function handleFileUpload(event) {
 }
 
 const isFormValid = computed(() => {
-  return previewImage.value && description.value.trim() !== ''
+  return previewImage.value && title.value.trim() !== '' && description.value.trim() !== ''
 })
 
 function validateBeforeUpload() {
   if (!previewImage.value) {
     showWarningFoto.value = true
+  } else if (title.value.trim() === '') {
+    showWarningTitle.value = true
   } else if (description.value.trim() === '') {
     showWarningRincian.value = true
   } else {
@@ -142,17 +163,21 @@ function validateBeforeUpload() {
 async function submitUpload() {
   showConfirmUpload.value = false
   try {
-    await saveToDatabase(previewImage.value, description.value)
+    await saveToDatabase(previewImage.value, title.value, description.value)
     showSuccess.value = true
   } catch (error) {
     console.error('Gagal upload:', error)
   }
 }
 
-function saveToDatabase(imageData, descriptionText) {
+function saveToDatabase(imageData, titleText, descriptionText) {
   return new Promise((resolve) => {
     setTimeout(() => {
-      console.log('Mengirim ke database:', { imageData, descriptionText })
+      console.log('Mengirim ke database:', {
+        imageData,
+        title: titleText,
+        description: descriptionText,
+      })
       resolve('success')
     }, 1500)
   })
@@ -161,6 +186,7 @@ function saveToDatabase(imageData, descriptionText) {
 function resetForm() {
   showSuccess.value = false
   previewImage.value = null
+  title.value = ''
   description.value = ''
 }
 
@@ -187,8 +213,8 @@ function confirmBack() {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 1rem;
-  padding: 1.5rem 1rem;
+  background:
+    linear-gradient(rgba(44, 57, 48, 0.93), rgba(44, 57, 48, 0.93)), url('@/assets/bg.png');
 }
 
 .left,
@@ -208,10 +234,13 @@ function confirmBack() {
   justify-content: flex-end;
 }
 
-.back-button img {
-  width: 24px;
-  height: 24px;
-  filter: brightness(0) invert(1);
+.back-button {
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
 }
 
 .app-title {
@@ -227,7 +256,7 @@ function confirmBack() {
   flex-direction: column;
   justify-content: space-between;
   background-color: #fff;
-  padding: 2rem;
+  padding: 1rem;
   border-radius: 20px 20px 0 0;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   height: 100%;
@@ -239,6 +268,7 @@ function confirmBack() {
   text-align: center;
   font-weight: bold;
   color: #1f3a2d;
+  font-size: 1.3rem;
 }
 
 .upload-wrapper {
@@ -249,19 +279,18 @@ function confirmBack() {
 }
 
 .upload-area {
-  border: 2px dashed black;
+  border: 2px dashed grey;
   border-radius: 8px;
   background: #c5c5c5;
   text-align: center;
   cursor: pointer;
-  width: 75%;
+  width: 60%;
   margin: 0 auto;
-  padding-bottom: 3.5rem;
   position: relative;
 }
 
 .upload-box {
-  width: 150px;
+  width: 100%;
   height: 100px;
   border-radius: 8px;
   overflow: hidden;
@@ -281,66 +310,58 @@ function confirmBack() {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  margin-top: 1.5rem;
 }
 
 .upload-instruction {
-  font-weight: 500;
   color: #333;
-  margin-bottom: 4px;
+  font-size: 12px;
 }
 
 .upload-note {
-  font-size: 12px;
+  font-size: 9px;
   color: #777;
 }
 
 .preview-image {
   width: 100%;
-  height: 100%;
-  object-fit: cover;
+  height: 100px;
 }
 
-.add-files-button-wrapper {
+.title-wrapper {
   display: flex;
-  justify-content: center;
-  position: absolute;
+  flex-direction: column;
+  margin-left: 1rem;
+}
+
+.title-label {
+  margin-bottom: 6px;
+  font-size: 12px;
+  color: #333;
+}
+
+.title-input {
   width: 100%;
-  margin: 0 auto;
-  margin-top: 2.5rem;
-}
-
-.add-files-button {
-  background-color: #4caf50;
-  color: white;
-  font-weight: bold;
-  padding: 10px 50px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.add-files-button:hover {
-  background-color: #45a049;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
 }
 
 .description-wrapper {
   display: flex;
   flex-direction: column;
-  margin-bottom: 16px;
-  margin-top: 10px;
+  margin-left: 1rem;
 }
 
 .description-label {
   margin-bottom: 6px;
-  font-weight: 500;
+  font-size: 12px;
   color: #333;
 }
 
 .description-textarea {
   width: 100%;
-  min-height: 100px;
+  height: auto;
   padding: 10px;
   border-radius: 6px;
   border: 1px solid #ccc;
@@ -349,7 +370,7 @@ function confirmBack() {
 }
 
 .submit-button {
-  width: 100%;
+  width: 40%;
   padding: 10px;
   background-color: #7d726a;
   color: white;
@@ -361,6 +382,11 @@ function confirmBack() {
     background-color 0.3s,
     cursor 0.3s;
   cursor: pointer;
+  margin: 0 auto;
+}
+
+.submit-button:hover {
+  background-color: grey;
 }
 
 .submit-button.active {
@@ -375,13 +401,16 @@ function confirmBack() {
   .form-upload {
     height: 100%;
     box-sizing: border-box;
-    min-height: calc(100vh - 10px);
+    min-height: calc(100vh - 84px);
     width: 100%;
     max-width: 800%;
   }
   .title {
     text-align: start;
     font-size: 1.5rem;
+  }
+  .submit-button {
+    margin-bottom: 1.5rem;
   }
 }
 </style>

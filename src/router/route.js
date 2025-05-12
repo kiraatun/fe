@@ -7,9 +7,7 @@ import ReportForm from '@/components/ReportForm.vue'
 import UpNews from '@/components/UpNews.vue'
 import AddAct from '@/components/AddAct.vue'
 import EditAct from '@/components/EditAct.vue'
-import EditKegiatan from '@/components/EditKegiatan.vue'
 import RemoveAct from '@/components/RemoveAct.vue'
-import RmAct from '@/components/RmAct.vue'
 import ManageAct from '@/components/ManageAct.vue'
 import MainHome from '@/components/MainHome.vue'
 import CommentTeach from '@/components/CommentTeach.vue'
@@ -27,13 +25,11 @@ const routes = [
   { path: '/profil', name: 'profil', component: ProfilView },
   { path: '/laporan', name: 'laporan', component: ReportForm },
   { path: '/dashboard', name: 'dashboard', component: DasboardGuru },
-  { path: '/kelola', name: 'manage', component: ManageAct }, // Kelola Kegiatan
+  { path: '/kelola/:submenu?', name: 'manage', component: ManageAct }, // Kelola Kegiatan
   { path: '/unggah', name: 'uploadNews', component: UpNews }, // Unggah Berita
-  { path: '/add', name: 'upload', component: AddAct }, // Tambah Kegiatan
-  { path: '/edit', name: 'edit', component: EditAct },
-  { path: '/edit/:id', name: 'EditKegiatan', component: EditKegiatan },
-  { path: '/remove', name: 'remove', component: RemoveAct },
-  { path: '/remove/:id', name: 'HapusKegiatan', component: RmAct },
+  { path: '/kelola/add', name: 'upload', component: AddAct }, // Tambah Kegiatan
+  { path: '/kelola/edit', name: 'edit', component: EditAct },
+  { path: '/kelola/remove', name: 'remove', component: RemoveAct },
   { path: '/comment', name: 'comment', component: CommentTeach },
   { path: '/dashboardortu', component: DashboardOrtu },
   { path: '/commentp', component: CommentOrtu },

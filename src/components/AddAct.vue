@@ -1,14 +1,15 @@
 <template>
   <div class="container">
     <!-- Header -->
-    <div class="page-header">
+    <div class="header">
       <div class="left">
         <button class="back-button" @click="goBack">
           <img src="@/assets/arrow-left.png" alt="Kembali" />
         </button>
       </div>
       <div class="center">
-        <h1 class="app-title">Smartkartika</h1>
+        <h1 v-if="!isDesktop" class="app-title">Smartkartika</h1>
+        <h1 v-if="isDesktop" class="title">TAMBAH KEGIATAN</h1>
       </div>
       <div class="right"></div>
       <!-- dummy agar kiri dan kanan seimbang -->
@@ -16,7 +17,7 @@
 
     <!-- Content -->
     <main class="content">
-      <h2 class="subtitle">TAMBAH KEGIATAN</h2>
+      <h2 v-if="!isDesktop" class="subtitle">TAMBAH KEGIATAN</h2>
 
       <form @submit.prevent="handleSave" class="form">
         <div class="form-group">
@@ -70,86 +71,84 @@
 
 <script setup>
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+// import { useRouter } from 'vue-router'
 
 import PopupConfirm from '@/components/BlokPopup.vue'
 import PopupConfirmBack from '@/components/BlokPopup.vue'
 import PopupSuccess from '@/components/MessagePopup.vue'
 
-const router = useRouter()
+//const router = useRouter()
+const emit = defineEmits(['back'])
+const isDesktop = ref(window.innerWidth >= 768)
 
+// Form input
 const form = ref({
   kegiatan: '',
   tanggal: '',
   rincian: '',
 })
 
-const showExitConfirm = ref(false)
+// State popup
 const showSaveConfirm = ref(false)
+const showExitConfirm = ref(false)
 const showSuccess = ref(false)
 
-const goBack = () => {
-  showExitConfirm.value = true
-}
-
-// Saat klik tombol "Simpan Kegiatan"
+// Simpan tombol ditekan
 const handleSave = () => {
   showSaveConfirm.value = true
 }
 
-// Saat user klik "UNGGAH" di popup konfirmasi
+// Simpan data
 const saveActivity = () => {
   showSaveConfirm.value = false
-
-  // Simulasi proses simpan data
-  setTimeout(() => {
-    showSuccess.value = true
-  }, 500)
+  showSuccess.value = true
 }
 
-// Saat user klik "YA" di popup keluar
+// Batal menyimpan
+const cancelSave = () => {
+  showSaveConfirm.value = false
+}
+
+// Tombol kembali ditekan
+const goBack = () => {
+  if (form.value.kegiatan || form.value.tanggal || form.value.rincian) {
+    showExitConfirm.value = true
+  } else {
+    showExitConfirm.value = false
+    emit('back')
+  }
+}
 const confirmExit = () => {
-  router.push('/kelola')
+  showExitConfirm.value = false
+  emit('back')
 }
 
-// Saat user klik tombol "OK" setelah sukses
-const goToKelolaKegiatan = () => {
-  showSuccess.value = false
-  router.back('')
-}
-
-// Saat batal keluar
+// Batal keluar
 const cancelExit = () => {
   showExitConfirm.value = false
 }
 
-// Saat batal upload
-const cancelSave = () => {
-  showSaveConfirm.value = false
+const goToKelolaKegiatan = () => {
+  showSuccess.value = false
+  emit('back')
 }
 </script>
 
-<style>
-/* Basic Reset */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
+<style scoped>
 .container {
-  min-height: 100vh;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
+  height: inherit;
+  width: inherit;
 }
 
 /* Header */
-.page-header {
+.header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 1rem;
-  padding: 1.5rem 1rem;
+  padding: 0.5rem;
 }
 
 .left,
@@ -177,7 +176,6 @@ const cancelSave = () => {
   cursor: pointer;
   width: 24px;
   height: 24px;
-  filter: brightness(0) invert(1);
 }
 
 .app-title {
@@ -189,20 +187,17 @@ const cancelSave = () => {
 
 /* Content */
 .content {
+  display: block;
   flex: 1;
-  display: flex;
   flex-direction: column;
   background-color: #fff;
-  padding: 1rem;
   border-radius: 20px 20px 0 0;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  height: 100%;
-  width: 100vw;
   box-sizing: border-box;
 }
 
 .subtitle {
-  font-size: 24px;
+  font-size: 1.3rem;
   font-weight: bold;
   text-align: center;
   color: #024c28;
@@ -212,11 +207,12 @@ const cancelSave = () => {
 .form {
   display: flex;
   flex-direction: column;
-  margin-bottom: 2rem;
+  width: 100%;
+  height: 100%;
 }
 
 .form-group {
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
 }
 .form-group label {
   display: block;
@@ -248,22 +244,40 @@ textarea {
   color: white;
   font-weight: bold;
   padding: 12px;
-  border: none;
   border-radius: 8px;
   cursor: pointer;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  width: 50%;
+  margin: 0 auto;
+  border: none;
   margin-top: 2rem;
+}
+
+.submit-button:hover {
+  background-color: #dea67a;
 }
 
 /* Responsive Desktop */
 @media (min-width: 768px) {
-  .page-header {
-    display: none;
+  .back-button {
+    filter: invert(1) brightness(0);
   }
-
+  .title {
+    color: #2c3930;
+    font-size: 1.3rem;
+    font-weight: bold;
+  }
   .subtitle {
     font-size: 2rem;
     text-align: start;
+    font-weight: bold;
+  }
+  .container {
+    display: block;
+    min-height: 100%;
+    height: 100%;
+    width: 100%;
+    display: flex;
   }
 
   .content {
@@ -271,14 +285,24 @@ textarea {
     width: 100%;
     height: 100%;
     margin: 0 auto;
+    box-shadow: none;
+    border-radius: none;
+  }
+
+  .form {
+    width: 100%;
+    padding: 1rem;
   }
 
   .subtitle {
-    font-size: 28px;
+    font-size: 1.3rem;
   }
 
   .submit-button {
-    font-size: 18px;
+    font-size: 15px;
+    padding: 8px;
+    width: 40%;
+    margin-top: 0;
   }
 }
 </style>
