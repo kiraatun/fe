@@ -18,14 +18,11 @@
         </template>
 
         <template v-else>
-          <div class="sidebar-item" @click="goTo('/comment')">
-            <div class="sidebar-text">Komentar</div>
+          <div class="sidebar-item" @click="goTo('/profil')">
+            <div class="sidebar-text">Profil</div>
           </div>
-          <div class="sidebar-item" @click="goTo('/berita')">
+          <div class="sidebar-item" @click="goTo('dashboard/home')">
             <div class="sidebar-text">Berita</div>
-          </div>
-          <div class="sidebar-item" @click="goTo('/laporan')">
-            <div class="sidebar-text">Laporan</div>
           </div>
           <div class="sidebar-item-logout" @click="goTo('/logout')">
             <div class="sidebar-text">Logout</div>
@@ -143,7 +140,7 @@ function goTo(route) {
   align-items: center;
   padding: 10px 30px;
   text-decoration: none;
-  margin-top: 12rem;
+  margin-top: 9rem;
   cursor: pointer;
 }
 

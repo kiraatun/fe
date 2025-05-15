@@ -20,13 +20,13 @@ export default {
   },
   methods: {
     confirm() {
-      this.$emit('confirm'); // Emit event untuk confirm
+      this.$emit('confirm') // Emit event untuk confirm
     },
     cancel() {
-      this.$emit('cancel'); // Emit event untuk membatalkan confirm
+      this.$emit('cancel') // Emit event untuk membatalkan confirm
     },
   },
-};
+}
 </script>
 
 <style scoped>
@@ -45,23 +45,27 @@ export default {
 
 .popup {
   background-color: white;
-  padding: 20px 50px 20px 50px;
+  padding: 15px 30px 15px 30px;
   border-radius: 10px;
   text-align: center;
 }
 
-.popup h2{
-  margin-bottom: 15px;
+.popup h2 {
+  margin-bottom: 12px;
+  font-size: 1.1rem;
+  font-weight: bold;
 }
 
 .popup p {
-  margin-bottom: 30px;
+  margin-bottom: 15px;
+  font-size: 0.8rem;
 }
 
-.confirm-button, .cancel-button {
+.confirm-button,
+.cancel-button {
   display: block;
   margin: 10px auto;
-  padding: 10px 20px;
+  padding: 7px 14px;
   width: 80%;
   border: none;
   border-radius: 5px;
@@ -74,7 +78,7 @@ export default {
 }
 
 .confirm-button:hover {
-  background-color: #C48863;
+  background-color: #c48863;
 }
 
 .cancel-button {

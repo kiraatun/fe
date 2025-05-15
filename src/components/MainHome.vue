@@ -40,7 +40,9 @@
 
       <div class="content-area" ref="contentArea">
         <div v-if="!selectedBerita && !isMobile" class="greeting-section">
-          <p class="greeting-text">Selamat Datang, {{ userName }}</p>
+          <p class="greeting-text">
+            Selamat Datang, <span class="user">{{ userName }}</span>
+          </p>
           <div class="berita-hari-ini">
             <h3>Berita hari ini</h3>
           </div>
@@ -87,6 +89,7 @@
             </div>
           </div>
           <button class="save-button" @click="saveChanges">Simpan Perubahan</button>
+          <button class="delete-button" @click="deleteBerita">Hapus Berita</button>
         </div>
       </div>
     </div>
@@ -112,7 +115,8 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import axios from 'axios'
+import { ref, onMounted } from 'vue'
 import Sidebar from '@/components/SidebarTemplate.vue'
 import { useRouter } from 'vue-router'
 
@@ -125,7 +129,7 @@ const router = useRouter()
 const isMobile = ref(window.innerWidth <= 768)
 const showSidebar = ref(false)
 const isLoggedIn = ref(true)
-const userName = ref('User')
+const userName = ref(localStorage.getItem('userName') || 'User')
 const selectedMenu = ref('')
 const imageInput = ref(null)
 const showConfirm = ref(false)
@@ -176,17 +180,33 @@ const handleScroll = () => {
 }
 
 onMounted(() => {
-  loadMoreBerita()
+  fetchBerita()
   contentArea.value?.addEventListener('scroll', handleScroll)
 })
 
-onUnmounted(() => {
-  contentArea.value?.removeEventListener('scroll', handleScroll)
-})
+const fetchBerita = async () => {
+  try {
+    const response = await axios.get('http://localhost:8000/api/documentations')
+    beritaList.value = response.data.data.map((item) => ({
+      id: item.id_document,
+      title: item.title,
+      description: item.description,
+      image: item.file_url, // URL dari backend
+    }))
+    console.log(beritaList.value) // Log data untuk memastikan URL benar
+  } catch (error) {
+    console.error('Gagal memuat berita:', error)
+  }
+}
 
 const selectBerita = (berita) => {
   selectedBerita.value = berita
-  editForm.value = { ...berita }
+  editForm.value = {
+    id: berita.id, // penting agar axios.put punya ID!
+    title: berita.title,
+    description: berita.description,
+    image: berita.image,
+  }
 }
 
 const goBack = () => {
@@ -194,7 +214,7 @@ const goBack = () => {
 }
 
 const goBackToDashboard = () => {
-  router.push('/dashboard')
+  router.push('/dashboard-guru')
 }
 
 const saveChanges = () => {
@@ -221,10 +241,29 @@ window.addEventListener('resize', () => {
   isMobile.value = window.innerWidth <= 768
 })
 
-const handleConfirmSave = () => {
-  Object.assign(selectedBerita.value, editForm.value)
-  showConfirm.value = false
-  showSuccess.value = true
+const deleteBerita = async () => {
+  try {
+    await axios.delete(`http://localhost:8000/api/documentations/${selectedBerita.value.id}`)
+    beritaList.value = beritaList.value.filter((b) => b.id !== selectedBerita.value.id)
+    selectedBerita.value = null
+    alert('Berita berhasil dihapus!')
+  } catch (error) {
+    alert('Gagal menghapus berita')
+    console.error(error)
+  }
+}
+
+const handleConfirmSave = async () => {
+  try {
+    await axios.put(`http://localhost:8000/api/documentations/${selectedBerita.value.id}`, {
+      title: editForm.value.title,
+      description: editForm.value.description,
+    })
+    showSuccess.value = true
+    showConfirm.value = false
+  } catch (error) {
+    alert('Gagal memperbarui berita')
+  }
 }
 </script>
 
@@ -263,10 +302,14 @@ const handleConfirmSave = () => {
   justify-content: flex-end;
 }
 
-.back-button img {
+.back-button {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 1.5rem;
+  cursor: pointer;
   width: 24px;
   height: 24px;
-  filter: brightness(0) invert(1);
 }
 
 .app-title {
@@ -386,8 +429,8 @@ const handleConfirmSave = () => {
   display: flex;
   flex-direction: column;
   height: 70%;
-  padding: 1rem;
-  gap: 5px;
+  padding: 0.5rem;
+  gap: 10px;
 }
 
 .berita-card {
@@ -459,18 +502,17 @@ const handleConfirmSave = () => {
     background-color 0.3s ease;
 }
 
-.input-descrition {
-  display: block;
-  width: 100%;
+.textarea-description {
   padding: 8px;
   margin-bottom: 8px;
   border-radius: 4px;
   border: 1px solid #8b8b8b;
-  background-color: #dfdfdf;
-  color: white;
+  background-color: #cdcdcd;
+  color: black;
   transition:
     border-color 0.3s ease,
     background-color 0.3s ease;
+  width: 100%;
 }
 
 .input-title:focus,
@@ -489,7 +531,7 @@ const handleConfirmSave = () => {
   padding: 10px 16px;
   border-radius: 8px;
   cursor: pointer;
-  width: 50%;
+  width: 40%;
   margin: 0 auto;
   margin-top: 2rem;
 }
@@ -506,6 +548,21 @@ const handleConfirmSave = () => {
     flex-direction: column;
     overflow: hidden;
   }
+  .page-header {
+    background: none;
+    background-size: cover;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 100%;
+    margin-bottom: 0;
+  }
+  .back-button {
+    filter: invert(1);
+  }
+  .app-title {
+    color: #2c3930;
+  }
   .berita-item {
     width: 50%;
     margin: 0 auto;
@@ -518,16 +575,6 @@ const handleConfirmSave = () => {
     max-width: 800%;
     padding: 0;
   }
-  .page-header {
-    background:
-      linear-gradient(rgba(44, 57, 48, 0.93), rgba(44, 57, 48, 0.93)), url('@/assets/bg.png');
-    background-size: cover;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    height: 100%;
-    margin-bottom: 0;
-  }
   .input-title {
     font-size: 1rem;
   }
@@ -535,7 +582,8 @@ const handleConfirmSave = () => {
     width: 40%;
   }
   .save-button {
-    margin-top: 0.5rem;
+    margin-top: 1rem;
+    width: 30%;
   }
 }
 </style>

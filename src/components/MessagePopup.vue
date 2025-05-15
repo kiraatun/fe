@@ -14,7 +14,7 @@ export default {
     showPopup: Boolean,
     title: String,
   },
-};
+}
 </script>
 
 <style scoped>
@@ -41,6 +41,7 @@ export default {
 .popup-container h2 {
   margin-bottom: 15px;
   font-weight: bold;
+  font-size: 1rem;
 }
 
 .popup-button {
@@ -56,6 +57,6 @@ export default {
 }
 
 .popup-button:hover {
-  background-color: #C48863;
+  background-color: #c48863;
 }
 </style>

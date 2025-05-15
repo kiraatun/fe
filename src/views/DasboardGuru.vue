@@ -2,15 +2,15 @@
   <div class="dashboard-container">
     <!-- Header -->
     <HeaderDashboard
-      v-if="!isMobile || (isMobile && !selectedMenu)"
+      v-if="!isMobile || (isMobile && route.name === 'dashboardRoot')"
       :isMobile="isMobile"
       :isLoggedIn="true"
       @toggleSidebar="showSidebar = !showSidebar"
     />
 
     <!-- MOBILE -->
-    <div v-if="isMobile" :class="['mobile-content', { 'no-background': selectedMenu }]">
-      <template v-if="!selectedMenu">
+    <div v-if="isMobile" :class="['mobile-content']">
+      <template v-if="route.name === 'dashboardRoot'">
         <div class="greeting">
           <p>
             Halo <strong class="user-name">{{ userName }}</strong>
@@ -18,15 +18,15 @@
           <p>Selamat Datang</p>
         </div>
         <div class="menu-grid">
-          <div class="menu-item" @click="selectMenu('laporan')">
+          <div class="menu-item" @click="goTo('upload')">
             <img src="@/assets/plus.png" alt="Buat Laporan" />
             <p>BUAT LAPORAN</p>
           </div>
-          <div class="menu-item" @click="selectMenu('uploadNews')">
+          <div class="menu-item" @click="goTo('uploadNews')">
             <img src="@/assets/file-alt.png" alt="Unggah Berita" />
             <p>UNGGAH BERITA</p>
           </div>
-          <div class="menu-item" @click="selectMenu('manage')">
+          <div class="menu-item" @click="goTo('manage')">
             <img src="@/assets/edit-alt.png" alt="Kelola Kegiatan" />
             <p>KELOLA KEGIATAN</p>
           </div>
@@ -35,11 +35,11 @@
 
       <template v-else>
         <div class="mobile-component">
-          <component
-            v-if="currentMobileComponent"
-            :is="currentMobileComponent"
-            @back="backToMobileMenu"
-          />
+          <router-view v-slot="{ Component }">
+            <keep-alive>
+              <component :is="Component" @back="backToMobileMenu" />
+            </keep-alive>
+          </router-view>
         </div>
       </template>
     </div>
@@ -47,37 +47,29 @@
     <!-- DESKTOP -->
     <div v-else class="desktop-content">
       <div class="left-panel">
-        <div class="menu" :class="{ active: selectedMenu === 'home' }" @click="selectMenu('home')">
+        <div class="menu" :class="{ active: route.name === 'home' }" @click="goTo('home')">
           <div class="icon-container">
             <img src="@/assets/home-alt.png" alt="Home" />
           </div>
           <span>Halaman Utama</span>
         </div>
-        <div
-          class="menu"
-          :class="{ active: selectedMenu === 'upload' }"
-          @click="selectMenu('upload')"
-        >
+        <div class="menu" :class="{ active: route.name === 'upload' }" @click="goTo('upload')">
           <div class="icon-container">
-            <img src="@/assets/plus.png" alt="Tambah Kegiatan" />
+            <img src="@/assets/plus.png" alt="Tambah Laporan" />
           </div>
           <span>Buat Laporan</span>
         </div>
         <div
           class="menu"
-          :class="{ active: selectedMenu === 'uploadNews' }"
-          @click="selectMenu('uploadNews')"
+          :class="{ active: route.name === 'uploadNews' }"
+          @click="goTo('uploadNews')"
         >
           <div class="icon-container">
             <img src="@/assets/camera-plus.png" alt="Tambah Dokumentasi" />
           </div>
           <span>Unggah Berita</span>
         </div>
-        <div
-          class="menu"
-          :class="{ active: selectedMenu === 'manage' }"
-          @click="selectMenu('manage')"
-        >
+        <div class="menu" :class="{ active: route.name === 'manage' }" @click="goTo('manage')">
           <div class="icon-container">
             <img src="@/assets/edit-alt.png" alt="Kelola Kegiatan" />
           </div>
@@ -93,50 +85,29 @@
       </div>
 
       <div class="right-panel">
-        <component :is="currentPageComponent" />
+        <router-view v-slot="{ Component }">
+          <keep-alive>
+            <component :is="Component" />
+          </keep-alive>
+        </router-view>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount, watch, computed } from 'vue'
+import { ref, onMounted, onBeforeUnmount } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import HeaderDashboard from '@/components/HeaderDashboard.vue'
 import axios from 'axios'
 
-import HomeContent from '@/components/MainHome.vue'
-import UploadPage from '@/components/ReportForm.vue'
-import UploadNewsPage from '@/components/UpNews.vue'
-import ManagePage from '@/components/ManageAct.vue'
+import HeaderDashboard from '@/components/HeaderDashboard.vue'
 
 const route = useRoute()
 const router = useRouter()
 
 const userName = ref(localStorage.getItem('userName') || 'User')
-
 const isMobile = ref(window.innerWidth <= 768)
-const selectedMenu = ref('home') // default halaman utama
-const showMobileMenu = ref(false) // dashboard mobile menu grid
-
-const components = {
-  home: HomeContent,
-  upload: UploadPage,
-  uploadNews: UploadNewsPage,
-  manage: ManagePage,
-  laporan: UploadPage,
-}
-
-// === Komponen desktop ===
-const currentPageComponent = computed(() => {
-  return components[selectedMenu.value] || HomeContent
-})
-
-// === Komponen mobile ===
-const currentMobileComponent = computed(() => {
-  if (showMobileMenu.value) return null
-  return components[selectedMenu.value] || null
-})
+const showSidebar = ref(false)
 
 function handleResize() {
   const wasMobile = isMobile.value
@@ -144,72 +115,35 @@ function handleResize() {
 
   if (wasMobile !== isMobile.value) {
     if (isMobile.value) {
-      // Pindah ke Mobile
-      if (selectedMenu.value === 'home') {
-        selectedMenu.value = null // khusus halaman utama, tampilkan dashboard mobile
-        showMobileMenu.value = true
-      } else {
-        showMobileMenu.value = false
+      // Dari desktop → mobile
+      if (route.name === 'home') {
+        router.replace({ name: 'dashboardRoot' })
       }
     } else {
-      // Pindah ke Desktop
-      if (!selectedMenu.value) {
-        selectedMenu.value = 'home'
+      // Dari mobile → desktop
+      if (route.name === 'dashboardRoot' || route.name === null) {
+        router.replace({ name: 'home' })
       }
-      showMobileMenu.value = false
     }
   }
 }
 
-// Menangani klik menu
-function selectMenu(menu) {
-  selectedMenu.value = menu
-  if (isMobile.value) {
-    showMobileMenu.value = false
-  }
+function goTo(menuName) {
+  router.push({ name: menuName })
 }
-
-// Monitoring perubahan route (optional)
-watch(
-  () => route.name,
-  (newRouteName) => {
-    if (newRouteName && !isMobile.value) {
-      selectedMenu.value = newRouteName
-    }
-  },
-)
-
-onMounted(() => {
-  window.addEventListener('resize', handleResize)
-
-  if (isMobile.value) {
-    if (selectedMenu.value === 'home') {
-      selectedMenu.value = null
-      showMobileMenu.value = true
-    }
-  }
-})
-
-onBeforeUnmount(() => {
-  window.removeEventListener('resize', handleResize)
-})
 
 function backToMobileMenu() {
-  selectedMenu.value = null
-  showMobileMenu.value = true
+  router.push('/dashboard')
 }
 
 async function logout() {
   try {
     const response = await axios.post('http://localhost:8000/api/logout')
-
     if (response.data.status === 'success') {
-      // Hapus semua data login dari localStorage
       localStorage.removeItem('isLoggedIn')
       localStorage.removeItem('role')
       localStorage.removeItem('userName')
-
-      router.push('/login') // Arahkan ke halaman login
+      router.push('/login')
     } else {
       alert('Logout gagal dari server.')
     }
@@ -218,6 +152,21 @@ async function logout() {
     alert('Logout gagal karena koneksi atau server.')
   }
 }
+
+onMounted(() => {
+  window.addEventListener('resize', handleResize)
+
+  // Redirect awal
+  if (isMobile.value && route.name === 'home') {
+    router.replace({ name: 'dashboardRoot' })
+  } else if (!isMobile.value && (route.name === null || route.name === 'dashboardRoot')) {
+    router.replace({ name: 'home' })
+  }
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', handleResize)
+})
 </script>
 
 <style scoped>
@@ -239,19 +188,21 @@ async function logout() {
 }
 
 .mobile-content.no-background {
-  background-color: transparent; /* Kalau sudah pilih menu: transparan */
+  background-color: transparent;
 }
 
 .greeting p {
   padding-left: 1rem;
-  color: #2c3930;
+  color: #8b8b8b;
   margin-top: 0.3rem;
   font-weight: bold;
+  font-size: 0.8rem;
 }
 
 .greeting .user-name {
   font-weight: bold;
   font-size: 1rem;
+  color: #2c3930;
 }
 
 .menu-grid {
@@ -262,7 +213,7 @@ async function logout() {
 }
 
 .menu-item {
-  width: 70%;
+  width: 60%;
   margin: 0 auto;
   background: #a27b5c;
   color: #fff;
@@ -308,24 +259,25 @@ async function logout() {
 }
 
 .left-panel {
-  width: 250px;
+  width: 175px;
   background-color: #fff;
   display: flex;
   flex-direction: column;
   padding: 10px;
   border-right: 1px solid #2c3930;
+  flex-shrink: 0;
 }
 
 .menu {
   background: #a27b5c;
   color: white;
   margin: 5px;
-  height: 80px;
+  height: 40px;
   display: flex;
   align-items: center;
   gap: 12px;
   cursor: pointer;
-  padding: 0 16px 0 0;
+  padding: 0 12px 0 0;
   border-radius: 12px;
   transition: background 0.3s;
   overflow: hidden;
@@ -333,7 +285,7 @@ async function logout() {
 
 .menu span {
   font-weight: bold;
-  font-size: 1rem;
+  font-size: 0.7rem;
 }
 
 .menu.active,
@@ -365,7 +317,7 @@ async function logout() {
 
 .logout {
   background: #d9d9d9;
-  height: 80px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -383,14 +335,15 @@ async function logout() {
 }
 
 .logout img {
-  width: 40px;
-  height: 40px;
+  width: 20px;
+  height: 20px;
   object-fit: contain;
 }
 
 .logout span {
   font-weight: bold;
   color: black;
+  font-size: 0.7rem;
 }
 
 .right-panel {
@@ -417,6 +370,6 @@ async function logout() {
 }
 
 .desktop-content .right-panel {
-  height: calc(100vh - 84px); /* Menyesuaikan tinggi dengan tinggi layar minus header jika ada */
+  height: calc(100vh - 84px);
 }
 </style>
