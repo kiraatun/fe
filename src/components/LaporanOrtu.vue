@@ -145,10 +145,14 @@ const goBack = () => {
   justify-content: flex-end;
 }
 
-.back-button img {
-  width: 24px;
-  height: 24px;
-  filter: brightness(0) invert(1);
+.back-button {
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  filter: invert(1);
 }
 
 .app-title {

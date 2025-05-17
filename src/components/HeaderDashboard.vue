@@ -75,7 +75,7 @@ const handleSelect = (menu) => {
     justify-content: flex-start;
   }
   .app-name {
-    font-size: 2.5rem;
+    font-size: 1.6rem;
     font-style: italic;
     margin: 0;
     text-align: left;

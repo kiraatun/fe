@@ -20,7 +20,7 @@
         <div class="menu-grid">
           <div class="menu-item" @click="goTo('upload')">
             <img src="@/assets/plus.png" alt="Buat Laporan" />
-            <p>BUAT LAPORAN</p>
+            <p>KELOLA LAPORAN</p>
           </div>
           <div class="menu-item" @click="goTo('uploadNews')">
             <img src="@/assets/file-alt.png" alt="Unggah Berita" />
@@ -29,6 +29,10 @@
           <div class="menu-item" @click="goTo('manage')">
             <img src="@/assets/edit-alt.png" alt="Kelola Kegiatan" />
             <p>KELOLA KEGIATAN</p>
+          </div>
+          <div class="menu-item" @click="goTo('kelas')">
+            <img src="@/assets/Vector.png" alt="Kelas" />
+            <p>KELAS</p>
           </div>
         </div>
       </template>
@@ -57,7 +61,7 @@
           <div class="icon-container">
             <img src="@/assets/plus.png" alt="Tambah Laporan" />
           </div>
-          <span>Buat Laporan</span>
+          <span>Kelola Laporan</span>
         </div>
         <div
           class="menu"
@@ -74,6 +78,12 @@
             <img src="@/assets/edit-alt.png" alt="Kelola Kegiatan" />
           </div>
           <span>Kelola Kegiatan</span>
+        </div>
+        <div class="menu" :class="{ active: route.name === 'kelas' }" @click="goTo('kelas')">
+          <div class="icon-container">
+            <img src="@/assets/Vector.png" alt="Kelas" />
+          </div>
+          <span>Kelas</span>
         </div>
 
         <div class="spacer"></div>
@@ -182,7 +192,6 @@ onBeforeUnmount(() => {
 .mobile-content {
   padding: 0;
   height: 100%;
-  overflow: hidden;
   margin: 0;
   background-color: #fff;
 }
@@ -206,14 +215,13 @@ onBeforeUnmount(() => {
 }
 
 .menu-grid {
-  display: flex;
-  flex-direction: column;
+  display: grid;
   margin: 10px;
-  gap: 16px;
+  gap: 12px;
 }
 
 .menu-item {
-  width: 60%;
+  width: 40%;
   margin: 0 auto;
   background: #a27b5c;
   color: #fff;
@@ -229,8 +237,8 @@ onBeforeUnmount(() => {
 }
 
 .menu-item img {
-  width: 80px;
-  height: 60px;
+  width: 50px;
+  height: 50px;
   object-fit: contain;
   background-color: #fff;
   border-radius: 8px;
@@ -306,12 +314,12 @@ onBeforeUnmount(() => {
   align-items: center;
   justify-content: center;
   margin-left: 0;
-  width: 35%;
+  width: 30%;
 }
 
 .icon-container img {
-  width: 50%;
-  height: 50%;
+  width: 40%;
+  height: 40%;
   object-fit: contain;
 }
 
@@ -367,9 +375,5 @@ onBeforeUnmount(() => {
   width: 100%;
   max-width: 100%;
   height: 100%;
-}
-
-.desktop-content .right-panel {
-  height: calc(100vh - 84px);
 }
 </style>
