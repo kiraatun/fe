@@ -440,7 +440,7 @@ const goBack = () => {
 .form-registrasi form {
   display: flex;
   flex-wrap: wrap;
-  gap: 16px;
+  gap: 6px;
   max-height: 100%;
   overflow-y: auto;
   padding-right: 8px;
@@ -459,7 +459,7 @@ const goBack = () => {
   border-top: 2px solid #ccc;
   padding-top: 10px;
   text-align: start;
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 600;
 }
 
@@ -477,21 +477,14 @@ const goBack = () => {
   margin-bottom: 16px;
   width: 100%;
   max-width: 600px;
-  margin-left: auto;
+  margin-left: 10rem;
   margin-right: auto;
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  flex: 1 1 10%;
 }
 
 .form-group-row label {
   width: 150px;
   font-weight: 600;
-  margin-right: 12px;
-  text-align: right;
+  text-align: left;
 }
 
 .form-group-row input,
@@ -534,8 +527,7 @@ const goBack = () => {
   display: flex;
   justify-content: flex-end;
   width: 100%;
-  max-width: 600px;
-  margin: 24px auto 0;
+  margin-bottom: 1rem;
 }
 
 .btn-submit {
@@ -578,6 +570,14 @@ const goBack = () => {
   padding: 10px 14px;
   border-bottom: 1px solid #e0e0e0;
   border: 1px solid #ccc;
+}
+
+.styled-table th {
+  font-weight: 600;
+}
+
+.styled-table td {
+  font-size: 0.8rem;
 }
 
 .styled-table th:nth-child(1),
@@ -671,15 +671,21 @@ const goBack = () => {
     color: #fff;
   }
 
-  .form-row {
+  .form-registrasi form {
     gap: 16px;
-    width: 50%;
-    margin: 0;
-    margin-left: 1rem;
   }
 
-  .form-group {
-    flex: 1 1 100%;
+  .form-group-row {
+    margin: 0;
+  }
+
+  .form-group-row label {
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+
+  .btn-submit {
+    margin-top: 1rem;
   }
 }
 </style>

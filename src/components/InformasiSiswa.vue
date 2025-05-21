@@ -132,9 +132,10 @@
               </div>
             </div>
           </div>
-          <div class="form-row">
-            <button class="submit" type="submit">
-              {{ editingIndex !== null ? 'Simpan Perubahan' : 'Daftarkan Siswa' }}
+          <div class="form-button">
+            <label></label>
+            <button type="submit" class="btn-submit">
+              {{ editingIndex !== null ? 'Simpan Perubahan' : 'Tambah Siswa' }}
             </button>
           </div>
         </form>
@@ -167,7 +168,9 @@
             <tr v-for="(student, index) in filteredData" :key="index">
               <td>{{ index + 1 }}</td>
               <td>{{ student.nama }}</td>
-              <td>{{ student.ttl }}</td>
+              <td>
+                {{ student.ttl?.tempatLahir || '-' }}, {{ formatDate(student.ttl?.tanggalLahir) }}
+              </td>
               <td>{{ student.nis }}</td>
               <td>{{ student.kelas }}</td>
               <td>{{ student.tahunAjaran }}</td>
@@ -250,10 +253,7 @@ import eyeOff from '@/assets/eye-off.png'
 const router = useRouter()
 
 const classData = ref({
-  'Daftar Siswa': [
-    { nama: 'Citra', nis: '003', tahunAjaran: '2024/2025', gender: 'Perempuan' },
-    { nama: 'Dewi', nis: '004', tahunAjaran: '2024/2025', gender: 'Perempuan' },
-  ],
+  'Daftar Siswa': [],
 })
 
 const daftarTahunAjaran = ref([])
@@ -299,6 +299,12 @@ async function fetchTahunAjaran() {
   } catch (error) {
     console.error('Gagal mengambil data tahun ajaran:', error)
   }
+}
+
+function formatDate(dateStr) {
+  if (!dateStr) return '-'
+  const options = { day: '2-digit', month: 'long', year: 'numeric' }
+  return new Date(dateStr).toLocaleDateString('id-ID', options)
 }
 
 function submitForm() {
@@ -387,7 +393,7 @@ function saveActivity() {
 }
 
 function editStudent(student, index) {
-  const combinedForm = { ...student, ...student.orangTua, ...student.akun }
+  const combinedForm = { ...student, ...student.ttl, ...student.orangTua, ...student.akun }
   form.value = combinedForm
   originalForm.value = JSON.parse(JSON.stringify(combinedForm)) // Simpan data awal
   editingIndex.value = index
@@ -675,21 +681,22 @@ const goBack = () => {
   height: 12px;
 }
 
-.form-row:last-child {
+.form-button {
+  display: flex;
   justify-content: flex-end;
+  width: 100%;
 }
 
-.submit {
-  background-color: #33d256;
+.btn-submit {
+  padding: 10px 20px;
+  background-color: #31d249;
   color: white;
   border: none;
-  padding: 8px 16px;
   border-radius: 6px;
   cursor: pointer;
-  margin-top: 1.5rem;
 }
 
-.submit:hover {
+.btn-submit:hover {
   background-color: #27c04d;
 }
 
@@ -719,6 +726,14 @@ const goBack = () => {
   padding: 10px 14px;
   border-bottom: 1px solid #e0e0e0;
   border: 1px solid #ccc;
+}
+
+.styled-table th {
+  font-weight: 600;
+}
+
+.styled-table td {
+  font-size: 0.8rem;
 }
 
 .styled-table th:nth-child(1),
@@ -812,15 +827,27 @@ const goBack = () => {
     color: #fff;
   }
 
+  .search-input {
+    width: 50%;
+  }
+
   .form-row {
     gap: 16px;
     width: 50%;
     margin: 0;
-    margin-left: 1rem;
   }
 
   .form-group {
     flex: 1 1 100%;
+  }
+
+  .form-group label {
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+
+  .form-button {
+    margin-bottom: 0;
   }
 }
 </style>
