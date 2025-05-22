@@ -43,6 +43,8 @@ const routes = [
       { path: 'ulpoadNews', name: 'uploadNews', component: UpNews },
       { path: 'manage', name: 'manage', component: KelolaKegiatan },
       { path: 'kelas', name: 'kelas', component: TabelKelas },
+      { path: 'infosiswa', name: 'infosiswa', component: InformasiSiswa },
+      { path: 'infoguru', name: 'infoguru', component: InformasiGuru },
     ],
   },
   //{ path: '/kelola/:submenu?', name: 'manage', component: ManageAct }, // Kelola Kegiatan
@@ -58,8 +60,6 @@ const routes = [
   { path: '/registerteach', component: RegisterTeacher },
   { path: '/registerparent', component: RegisterParent },
   { path: '/viewkegiatan', component: ViewKegiatan },
-  { path: '/infosiswa', component: InformasiSiswa },
-  { path: '/infoguru', component: InformasiGuru },
   //{ path: '/laporanview', name: 'laporanview', component: LaporanView },
   //{ path: '/manage', component: KelolaKegiatan },
 ]

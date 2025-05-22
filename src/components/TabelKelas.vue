@@ -80,7 +80,7 @@
               <th>Nama</th>
               <th>NIS</th>
               <th>Tahun Ajaran</th>
-              <th>Gender</th>
+              <th>Jenis Kelamin</th>
             </tr>
           </thead>
           <tbody>

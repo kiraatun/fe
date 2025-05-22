@@ -3,10 +3,7 @@
     <div class="sidebar">
       <!-- Header profile -->
       <div class="profile-header">
-        <label class="profile-upload">
-          <img :src="profileImage" alt="User Icon" class="profile-icon" />
-        </label>
-        <span class="profile-name">{{ isLoggedIn ? userName : 'Tamu' }}</span>
+        <span class="profile-name">Smartkartika</span>
       </div>
 
       <!-- Menu -->
@@ -19,15 +16,68 @@
 
         <template v-else>
           <div class="sidebar-item" @click="goTo('/profil')">
+            <div class="icon-container">
+              <img src="@/assets/user.png" alt="" class="icon-img" />
+            </div>
             <div class="sidebar-text">Profil</div>
           </div>
-          <div class="sidebar-item" @click="goTo('dashboard/home')">
-            <div class="sidebar-text">Berita</div>
+          <div class="sidebar-item" @click="goTo('upload')">
+            <div class="icon-container">
+              <img src="@/assets/plus.png" alt="" class="icon-img" />
+            </div>
+            <div class="sidebar-text">Kelola Laporan</div>
           </div>
-          <div class="sidebar-item-logout" @click="goTo('/logout')">
-            <div class="sidebar-text">Logout</div>
+          <div class="sidebar-item" @click="goTo('uploadNews')">
+            <div class="icon-container">
+              <img src="@/assets/camera-plus.png" alt="" class="icon-img" />
+            </div>
+            <div class="sidebar-text">Unggah Berita</div>
+          </div>
+          <div class="sidebar-item" @click="goTo('manage')">
+            <div class="icon-container">
+              <img src="@/assets/edit-alt.png" alt="" class="icon-img" />
+            </div>
+            <div class="sidebar-text">Kelola Kegiatan</div>
+          </div>
+          <div class="sidebar-item" @click="goTo('kelas')">
+            <div class="icon-container">
+              <img src="@/assets/graduation-cap.png" alt="" class="icon-img" />
+            </div>
+            <div class="sidebar-text">Kelas</div>
+          </div>
+          <div class="sidebar-item parent-item" @click="toggleSubmenu">
+            <div class="icon-container">
+              <img src="@/assets/menu-hamburger.png" alt="" class="icon-img" />
+            </div>
+
+            <div class="sidebar-text">Informasi</div>
+            <div class="icon-container icon">
+              <img :src="showSubmenu ? ChevronDown : ChevronRight" alt="" class="icon-img" />
+            </div>
+          </div>
+
+          <div v-if="showSubmenu" class="submenu-wrapper">
+            <div class="sidebar-item submenu" @click="goTo('infosiswa')">
+              <div class="icon-container">
+                <img src="@/assets/info-circle.png" alt="" class="icon-img" />
+              </div>
+              <div class="sidebar-text submenu">Informasi Siswa</div>
+            </div>
+            <div class="sidebar-item submenu" @click="goTo('infoguru')">
+              <div class="icon-container">
+                <img src="@/assets/info-circle.png" alt="" class="icon-img" />
+              </div>
+              <div class="sidebar-text submenu">Informasi Guru</div>
+            </div>
           </div>
         </template>
+      </div>
+      <!-- Tombol logout di bawah -->
+      <div v-if="isLoggedIn" class="sidebar-item-logout" @click="goTo('/logout')">
+        <div class="icon-container">
+          <img src="@/assets/upload-alt.png" alt="" class="icon-img" />
+        </div>
+        <div class="sidebar-text logout">Logout</div>
       </div>
     </div>
   </div>
@@ -35,17 +85,15 @@
 
 <script setup>
 import { useRouter } from 'vue-router'
-import { computed } from 'vue'
-import { useUserStore } from '@/stores/user'
-import defaultImage from '@/assets/profil.jpeg'
+import { ref } from 'vue'
 import { defineProps } from 'vue'
+import ChevronDown from '@/assets/chevron-down-sm.png'
+import ChevronRight from '@/assets/chevron-right-sm.png'
 
 const router = useRouter()
-const userStore = useUserStore()
+const showSubmenu = ref(false)
 
-const profileImage = computed(() => userStore.photoUrl || defaultImage)
-
-const { isLoggedIn, userName } = defineProps({
+const { isLoggedIn } = defineProps({
   isLoggedIn: {
     type: Boolean,
     required: true,
@@ -55,6 +103,10 @@ const { isLoggedIn, userName } = defineProps({
     default: '',
   },
 })
+
+function toggleSubmenu() {
+  showSubmenu.value = !showSubmenu.value
+}
 
 function goTo(route) {
   router.push(route)
@@ -91,12 +143,12 @@ function goTo(route) {
   display: flex;
   align-items: center;
   width: 100%;
-  margin-bottom: 2rem;
+  height: 10%;
 }
 
 .sidebar-content {
   flex: 1;
-  padding-top: 20px;
+  padding-top: 10px;
   overflow-y: auto;
 }
 
@@ -110,69 +162,83 @@ function goTo(route) {
   opacity: 0;
 }
 
-.profile-icon {
-  width: 100%;
-  height: 60px;
-  background-color: #ccc;
-  border-radius: 50%;
-  object-fit: cover;
-}
-
 .profile-name {
   color: white;
-  font-size: 20px;
+  font-size: 15px;
   font-weight: bold;
 }
 
 .sidebar-item {
-  background-color: #2f4036;
+  background-color: #fff;
   display: flex;
   align-items: center;
-  padding: 10px 30px;
+  padding: 10px 20px;
   text-decoration: none;
-  border-bottom: 2px solid #fff;
   cursor: pointer;
+  color: #000;
 }
 
 .sidebar-item-logout {
-  background-color: #2f4036;
+  background-color: #d4d2d2;
   display: flex;
   align-items: center;
   padding: 10px 30px;
   text-decoration: none;
-  margin-top: 9rem;
   cursor: pointer;
+  margin: 0.5rem;
+  border-radius: 10px;
 }
 
 .sidebar-item:hover {
-  background-color: #3b5546;
+  border-radius: 10px;
+  background-color: #cfd1d0;
+  margin: 0 0.5rem;
 }
 
 .sidebar-item-logout:hover {
-  background-color: #3b5546;
+  background-color: #b8b8b8;
 }
 
 .icon-container {
-  width: 30px;
-  height: 30px;
-  margin-right: 10px;
+  width: 20px;
+  height: 20px;
+  margin-right: 8px;
   display: flex;
-  justify-content: center;
   align-items: center;
 }
 
-.icon {
+.icon-container.icon {
+  margin-left: 2.4rem;
+}
+
+.icon-img {
   width: 100%;
-  height: 100%;
+  max-height: 14px;
+  object-fit: contain;
 }
 
 .sidebar-text {
-  color: #ffffff;
-  font-size: 16px;
+  color: #000;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.sidebar-text.submenu {
+  font-size: 11px;
+}
+
+.sidebar-text.logout {
   font-weight: bold;
 }
 
-.logout {
-  margin-top: auto;
+.sidebar-text:hover {
+  font-weight: bold;
+}
+
+.submenu-wrapper {
+  border-left: 2px solid #93909070;
+  margin-left: 25px;
+  display: flex;
+  flex-direction: column;
 }
 </style>

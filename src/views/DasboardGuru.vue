@@ -8,49 +8,9 @@
       @toggleSidebar="showSidebar = !showSidebar"
     />
 
-    <!-- MOBILE -->
-    <div v-if="isMobile" :class="['mobile-content']">
-      <template v-if="route.name === 'dashboardRoot'">
-        <div class="greeting">
-          <p>
-            Halo <strong class="user-name">{{ userName }}</strong>
-          </p>
-          <p>Selamat Datang</p>
-        </div>
-        <div class="menu-grid">
-          <div class="menu-item" @click="goTo('upload')">
-            <img src="@/assets/plus.png" alt="Buat Laporan" />
-            <p>KELOLA LAPORAN</p>
-          </div>
-          <div class="menu-item" @click="goTo('uploadNews')">
-            <img src="@/assets/file-alt.png" alt="Unggah Berita" />
-            <p>UNGGAH BERITA</p>
-          </div>
-          <div class="menu-item" @click="goTo('manage')">
-            <img src="@/assets/edit-alt.png" alt="Kelola Kegiatan" />
-            <p>KELOLA KEGIATAN</p>
-          </div>
-          <div class="menu-item" @click="goTo('kelas')">
-            <img src="@/assets/Vector.png" alt="Kelas" />
-            <p>KELAS</p>
-          </div>
-        </div>
-      </template>
-
-      <template v-else>
-        <div class="mobile-component">
-          <router-view v-slot="{ Component }">
-            <keep-alive>
-              <component :is="Component" @back="backToMobileMenu" />
-            </keep-alive>
-          </router-view>
-        </div>
-      </template>
-    </div>
-
     <!-- DESKTOP -->
-    <div v-else class="desktop-content">
-      <div class="left-panel">
+    <div class="desktop-content">
+      <div v-if="!isMobile" class="left-panel">
         <div class="menu" :class="{ active: route.name === 'home' }" @click="goTo('home')">
           <div class="icon-container">
             <img src="@/assets/home-alt.png" alt="Home" />
@@ -81,9 +41,38 @@
         </div>
         <div class="menu" :class="{ active: route.name === 'kelas' }" @click="goTo('kelas')">
           <div class="icon-container">
-            <img src="@/assets/Vector.png" alt="Kelas" />
+            <img src="@/assets/graduation-cap.png" alt="Kelas" />
           </div>
           <span>Kelas</span>
+        </div>
+        <div class="menu" @click="toggleSubmenu">
+          <div class="icon-container">
+            <img src="@/assets/menu-hamburger.png" alt="Informasi" />
+          </div>
+          <span>Informasi</span>
+        </div>
+
+        <div v-if="showSubmenu" class="submenu">
+          <div
+            class="menu submenu"
+            :class="{ active: route.name === 'infosiswa' }"
+            @click="goTo('infosiswa')"
+          >
+            <div class="icon-container submenu">
+              <img src="@/assets/info-circle.png" alt="Info" />
+            </div>
+            <span>Infromasi Siswa</span>
+          </div>
+          <div
+            class="menu submenu"
+            :class="{ active: route.name === 'infoguru' }"
+            @click="goTo('infoguru')"
+          >
+            <div class="icon-container submenu">
+              <img src="@/assets/info-circle.png" alt="" />
+            </div>
+            <span>Informasi Guru</span>
+          </div>
         </div>
 
         <div class="spacer"></div>
@@ -115,9 +104,9 @@ import HeaderDashboard from '@/components/HeaderDashboard.vue'
 const route = useRoute()
 const router = useRouter()
 
-const userName = ref(localStorage.getItem('userName') || 'User')
 const isMobile = ref(window.innerWidth <= 768)
 const showSidebar = ref(false)
+const showSubmenu = ref(false)
 
 function handleResize() {
   const wasMobile = isMobile.value
@@ -127,7 +116,7 @@ function handleResize() {
     if (isMobile.value) {
       // Dari desktop → mobile
       if (route.name === 'home') {
-        router.replace({ name: 'dashboardRoot' })
+        router.replace({ name: 'home' })
       }
     } else {
       // Dari mobile → desktop
@@ -138,12 +127,13 @@ function handleResize() {
   }
 }
 
-function goTo(menuName) {
-  router.push({ name: menuName })
+function goTo(name) {
+  showSubmenu.value = false
+  router.push({ name })
 }
 
-function backToMobileMenu() {
-  router.push('/dashboard')
+function toggleSubmenu() {
+  showSubmenu.value = !showSubmenu.value
 }
 
 async function logout() {
@@ -168,7 +158,7 @@ onMounted(() => {
 
   // Redirect awal
   if (isMobile.value && route.name === 'home') {
-    router.replace({ name: 'dashboardRoot' })
+    router.replace({ name: 'home' })
   } else if (!isMobile.value && (route.name === null || route.name === 'dashboardRoot')) {
     router.replace({ name: 'home' })
   }
@@ -188,74 +178,6 @@ onBeforeUnmount(() => {
   overflow: hidden;
 }
 
-/* === MOBILE === */
-.mobile-content {
-  padding: 0;
-  height: 100%;
-  margin: 0;
-  background-color: #fff;
-}
-
-.mobile-content.no-background {
-  background-color: transparent;
-}
-
-.greeting p {
-  padding-left: 1rem;
-  color: #8b8b8b;
-  margin-top: 0.3rem;
-  font-weight: bold;
-  font-size: 0.8rem;
-}
-
-.greeting .user-name {
-  font-weight: bold;
-  font-size: 1rem;
-  color: #2c3930;
-}
-
-.menu-grid {
-  display: grid;
-  margin: 10px;
-  gap: 12px;
-}
-
-.menu-item {
-  width: 40%;
-  margin: 0 auto;
-  background: #a27b5c;
-  color: #fff;
-  border-radius: 12px;
-  padding: 5px;
-  text-align: center;
-  cursor: pointer;
-  transition: background 0.3s;
-}
-
-.menu-item:hover {
-  background-color: #dea67a;
-}
-
-.menu-item img {
-  width: 50px;
-  height: 50px;
-  object-fit: contain;
-  background-color: #fff;
-  border-radius: 8px;
-  padding: 0.5rem;
-}
-
-.menu-item p {
-  font-weight: bold;
-  font-size: 1rem;
-}
-
-.mobile-component {
-  flex-grow: 1;
-  overflow-y: auto;
-  min-height: 0;
-}
-
 /* === DESKTOP === */
 .desktop-content {
   display: flex;
@@ -267,8 +189,8 @@ onBeforeUnmount(() => {
 }
 
 .left-panel {
-  width: 175px;
-  background-color: #fff;
+  width: 185px;
+  background-color: #f9fafa;
   display: flex;
   flex-direction: column;
   padding: 10px;
@@ -277,9 +199,7 @@ onBeforeUnmount(() => {
 }
 
 .menu {
-  background: #a27b5c;
-  color: white;
-  margin: 5px;
+  color: #000;
   height: 40px;
   display: flex;
   align-items: center;
@@ -291,14 +211,28 @@ onBeforeUnmount(() => {
   overflow: hidden;
 }
 
+.menu.submenu {
+  height: 40px;
+  border-radius: 8px;
+  gap: 0;
+  padding: 0;
+  margin-left: 1rem;
+  flex-direction: row;
+  border: none;
+}
+
 .menu span {
   font-weight: bold;
   font-size: 0.7rem;
 }
 
+.menu.submenu span {
+  font-size: 0.6rem;
+}
+
 .menu.active,
 .menu:hover {
-  background: #dea67a;
+  background: #cfd1d0;
 }
 
 .spacer {
@@ -307,8 +241,6 @@ onBeforeUnmount(() => {
 
 .icon-container {
   height: 100%;
-  aspect-ratio: 1/1;
-  background-color: #d9d9d9;
   border-radius: 12px;
   display: flex;
   align-items: center;
@@ -317,32 +249,46 @@ onBeforeUnmount(() => {
   width: 30%;
 }
 
+.icon-container.submenu {
+  margin-left: 0;
+  width: 28%;
+  border: none;
+}
+
 .icon-container img {
   width: 40%;
   height: 40%;
   object-fit: contain;
 }
 
+.submenu {
+  border-left: 2px solid #93909070;
+  margin-left: 18px;
+  display: flex;
+  flex-direction: column;
+}
+
 .logout {
-  background: #d9d9d9;
+  background: #d4d2d2;
   height: 40px;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 12px;
   cursor: pointer;
-  border-radius: 12px;
+  border-radius: 5px;
   transition: background 0.3s;
-  margin-top: 5rem;
+  margin-top: 2rem;
   width: 100%;
   padding-left: 0;
 }
 
 .logout:hover {
-  background-color: gray;
+  background-color: #b8b8b8;
 }
 
 .logout img {
+  margin-left: 1rem;
   width: 20px;
   height: 20px;
   object-fit: contain;

@@ -13,33 +13,17 @@
       <div class="right"></div>
     </div>
 
-    <div v-if="!selectedBerita && isMobile" class="page-header">
-      <div class="left">
-        <button class="back-button" @click="goBackToDashboard">
-          <img src="@/assets/arrow-left.png" alt="kembali" />
-        </button>
-      </div>
-      <div class="center">
-        <h1 class="app-title">Berita Hari ini</h1>
-      </div>
-      <div class="right"></div>
-    </div>
+    <HeaderDashboard
+      v-if="isMobile && !selectedBerita"
+      :isMobile="isMobile"
+      :isLoggedIn="true"
+      @toggleSidebar="showSidebar = !showSidebar"
+    />
 
     <!-- Main content -->
     <div class="main-content">
-      <div class="sidebar-area">
-        <Sidebar
-          v-if="isMobile && showSidebar && !selectedBerita"
-          :isMobile="isMobile"
-          :isLoggedIn="isLoggedIn"
-          :userName="userName"
-          @close="showSidebar = false"
-          @select="(menu) => (selectedMenu = menu)"
-        />
-      </div>
-
       <div class="content-area" ref="contentArea">
-        <div v-if="!selectedBerita && !isMobile" class="greeting-section">
+        <div v-if="!selectedBerita" class="greeting-section">
           <p class="greeting-text">
             Selamat Datang, <span class="user">{{ userName }}</span>
           </p>
@@ -117,20 +101,15 @@
 <script setup>
 import axios from 'axios'
 import { ref, onMounted } from 'vue'
-import Sidebar from '@/components/SidebarTemplate.vue'
-import { useRouter } from 'vue-router'
-
+import HeaderDashboard from '@/components/HeaderDashboard.vue'
 import ConfirmDialog from '@/components/BlokPopup.vue'
 import SuccessDialog from '@/components/MessagePopup.vue'
 
 const beritaList = ref([])
 const selectedBerita = ref(null)
-const router = useRouter()
 const isMobile = ref(window.innerWidth <= 768)
 const showSidebar = ref(false)
-const isLoggedIn = ref(true)
 const userName = ref(localStorage.getItem('userName') || 'User')
-const selectedMenu = ref('')
 const imageInput = ref(null)
 const showConfirm = ref(false)
 const showSuccess = ref(false)
@@ -138,7 +117,6 @@ const page = ref(1)
 const itemsPerPage = 3
 const isLoading = ref(false)
 const contentArea = ref(null)
-
 const editForm = ref({
   title: '',
   subtitle: '',
@@ -213,10 +191,6 @@ const goBack = () => {
   selectedBerita.value = null
 }
 
-const goBackToDashboard = () => {
-  router.push('/dashboard-guru')
-}
-
 const saveChanges = () => {
   Object.assign(selectedBerita.value, editForm.value)
   showConfirm.value = true
@@ -272,6 +246,11 @@ const handleConfirmSave = async () => {
   height: 100vh;
   display: flex;
   flex-direction: column;
+}
+
+.header {
+  background:
+    linear-gradient(rgba(44, 57, 48, 0.93), rgba(44, 57, 48, 0.93)), url('@/assets/bg.png');
 }
 
 /* Header saat lihat detail berita */
@@ -353,28 +332,21 @@ const handleConfirmSave = async () => {
 .greeting-text {
   font-size: 1rem;
   font-weight: bold;
-  margin-bottom: 1.5rem;
+  margin-bottom: 0.5rem;
   color: #8b8b8b;
   margin-left: 0.8rem;
-  margin-top: 1.5rem;
 }
 
 .greeting-section .user {
   color: #2c3930;
   font-weight: bold;
-  font-size: 1.2rem;
-}
-.berita-hari-ini {
-  margin-bottom: 1rem;
-}
-
-.berita-hari-ini h3 {
   font-size: 1.1rem;
+}
+.berita-hari-ini h3 {
+  font-size: 0.9rem;
   font-weight: bold;
-  color: #2c3930;
-  margin: 0;
-  text-decoration: underline;
-  margin-left: 11.5rem;
+  color: #000;
+  margin-left: 0.8rem;
 }
 
 /* Berita List */
