@@ -48,7 +48,7 @@ export default {
   display: block;
   margin: 10px auto;
   padding: 10px 20px;
-  width: 80%;
+  width: 100%;
   border: none;
   border-radius: 5px;
   cursor: pointer;

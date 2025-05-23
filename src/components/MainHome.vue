@@ -47,33 +47,50 @@
         </div>
 
         <div v-else class="berita-detail">
-          <div class="berita-card">
-            <img
-              :src="editForm.image"
-              alt="detail"
-              class="detail-image"
-              @click="triggerImageUpload"
-            />
-            <input
-              ref="imageInput"
-              type="file"
-              accept="image/*"
-              style="display: none"
-              @change="handleImageChange"
-            />
-            <div class="berita-card-text">
-              <input v-model="editForm.title" class="input-title" />
+          <!-- Area atas berisi tombol save -->
+          <div class="detail-header">
+            <button class="save-button" @click="saveChanges">Simpan Perubahan</button>
+          </div>
+
+          <!-- Isi konten berita -->
+          <div class="detail-content">
+            <!-- Gambar -->
+            <div class="berita-card">
+              <img
+                :src="editForm.image"
+                alt="detail"
+                class="detail-image"
+                @click="triggerImageUpload"
+              />
+              <input
+                ref="imageInput"
+                type="file"
+                accept="image/*"
+                style="display: none"
+                @change="handleImageChange"
+              />
+            </div>
+
+            <!-- Deskripsi -->
+            <div class="detail-description">
+              <!-- Judul -->
+              <div class="berita-card-text">
+                <input v-model="editForm.title" class="input-title" placeholder="Judul berita" />
+              </div>
+              <div class="description-box">
+                <textarea
+                  v-model="editForm.description"
+                  class="textarea-description"
+                  placeholder="Deskripsi berita"
+                ></textarea>
+              </div>
             </div>
           </div>
 
-          <div class="detail-description">
-            <strong class="description-label">Deskripsi :</strong>
-            <div class="description-box">
-              <textarea v-model="editForm.description" class="textarea-description"></textarea>
-            </div>
+          <!-- Area bawah berisi tombol hapus -->
+          <div class="detail-footer">
+            <button class="delete-button" @click="deleteBerita">Hapus Berita</button>
           </div>
-          <button class="save-button" @click="saveChanges">Simpan Perubahan</button>
-          <button class="delete-button" @click="deleteBerita">Hapus Berita</button>
         </div>
       </div>
     </div>
@@ -88,12 +105,34 @@
       @confirm="handleConfirmSave"
     />
 
+    <ConfirmDialog
+      v-if="showConfirmDelete"
+      title="Konfirmasi Hapus Berita"
+      message="Apakah Anda yakin ingin menghapus berita ini?"
+      :konfirmasi="'IYA'"
+      :batalkan="'BATAL'"
+      @close="showConfirmDelete = false"
+      @confirm="handleConfirmDelete"
+    />
+
     <!-- Success Dialog -->
     <SuccessDialog
       v-if="showSuccess"
-      title="Berhasil"
-      message="Perubahan berhasil disimpan!"
+      title="Perubahan Berhasil Disimpan"
       @close="showSuccess = false"
+    />
+
+    <SuccessDialog v-if="showFail" title="Perubahan Gagal Disimpan" @close="showFail = false" />
+    <SuccessDialog
+      v-if="showSuccessDelete"
+      title="Beita Berhasil Dihapus"
+      @close="showSuccessDelete = false"
+    />
+
+    <SuccessDialog
+      v-if="showFailDelete"
+      title="Gagal Menghapus Berita"
+      @close="showFailDelete = false"
     />
   </div>
 </template>
@@ -113,6 +152,10 @@ const userName = ref(localStorage.getItem('userName') || 'User')
 const imageInput = ref(null)
 const showConfirm = ref(false)
 const showSuccess = ref(false)
+const showConfirmDelete = ref(false)
+const showSuccessDelete = ref(false)
+const showFailDelete = ref(false)
+const showFail = ref(false)
 const page = ref(1)
 const itemsPerPage = 3
 const isLoading = ref(false)
@@ -123,6 +166,8 @@ const editForm = ref({
   description: '',
   image: '',
 })
+
+const nipGuru = localStorage.getItem('nip')
 
 const dummyBerita = Array.from({ length: 15 }, (_, i) => ({
   id: i + 1,
@@ -158,7 +203,8 @@ const handleScroll = () => {
 }
 
 onMounted(() => {
-  fetchBerita()
+  //fetchBerita()
+  beritaList.value = dummyBerita.slice(0, itemsPerPage)
   contentArea.value?.addEventListener('scroll', handleScroll)
 })
 
@@ -187,10 +233,6 @@ const selectBerita = (berita) => {
   }
 }
 
-const goBack = () => {
-  selectedBerita.value = null
-}
-
 const saveChanges = () => {
   Object.assign(selectedBerita.value, editForm.value)
   showConfirm.value = true
@@ -215,15 +257,21 @@ window.addEventListener('resize', () => {
   isMobile.value = window.innerWidth <= 768
 })
 
-const deleteBerita = async () => {
+const deleteBerita = () => {
+  showConfirmDelete.value = true
+}
+
+const handleConfirmDelete = async () => {
   try {
     await axios.delete(`http://localhost:8000/api/documentations/${selectedBerita.value.id}`)
     beritaList.value = beritaList.value.filter((b) => b.id !== selectedBerita.value.id)
     selectedBerita.value = null
-    alert('Berita berhasil dihapus!')
+    showSuccessDelete.value = true
   } catch (error) {
-    alert('Gagal menghapus berita')
+    showFailDelete.value = true
     console.error(error)
+  } finally {
+    showConfirmDelete.value = false
   }
 }
 
@@ -232,12 +280,19 @@ const handleConfirmSave = async () => {
     await axios.put(`http://localhost:8000/api/documentations/${selectedBerita.value.id}`, {
       title: editForm.value.title,
       description: editForm.value.description,
+      nip: nipGuru,
     })
     showSuccess.value = true
-    showConfirm.value = false
   } catch (error) {
-    alert('Gagal memperbarui berita')
+    showFail.value = true
+    console.error(error)
+  } finally {
+    showConfirm.value = false
   }
+}
+
+const goBack = () => {
+  selectedBerita.value = null
 }
 </script>
 
@@ -258,7 +313,6 @@ const handleConfirmSave = async () => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 0.5rem;
   padding: 0.5rem;
   background:
     linear-gradient(rgba(44, 57, 48, 0.93), rgba(44, 57, 48, 0.93)), url('@/assets/bg.png');
@@ -284,7 +338,6 @@ const handleConfirmSave = async () => {
 .back-button {
   background: none;
   border: none;
-  color: #fff;
   font-size: 1.5rem;
   cursor: pointer;
   width: 24px;
@@ -302,8 +355,7 @@ const handleConfirmSave = async () => {
 .main-content {
   display: flex;
   flex: 1;
-  height: 100%;
-  overflow: hidden;
+  min-height: calc(100vh - 130px);
   position: relative;
   flex-direction: column;
 }
@@ -332,7 +384,7 @@ const handleConfirmSave = async () => {
 .greeting-text {
   font-size: 1rem;
   font-weight: bold;
-  margin-bottom: 0.5rem;
+  margin-bottom: 1.5rem;
   color: #8b8b8b;
   margin-left: 0.8rem;
 }
@@ -342,6 +394,7 @@ const handleConfirmSave = async () => {
   font-weight: bold;
   font-size: 1.1rem;
 }
+
 .berita-hari-ini h3 {
   font-size: 0.9rem;
   font-weight: bold;
@@ -370,19 +423,20 @@ const handleConfirmSave = async () => {
 .berita-item {
   width: 70%;
   background: #2c3930;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 2px 8px rgba(0, 0, 0, 0.1);
   cursor: pointer;
   display: flex;
   flex-direction: column;
   margin: 0 auto;
+  border-radius: 8px;
 }
 
 .berita-image {
   width: 100%;
-  height: 200px;
-  max-height: 200px;
+  height: 350px;
+  max-height: 350px;
+  border-radius: 8px;
+  object-fit: cover;
 }
 
 .berita-info {
@@ -400,124 +454,116 @@ const handleConfirmSave = async () => {
 .berita-detail {
   display: flex;
   flex-direction: column;
-  height: 70%;
-  padding: 0.5rem;
-  gap: 10px;
+  height: 100%;
+  padding: 1rem;
+  background-color: #fff;
+}
+
+.detail-header {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 0.5rem;
+}
+
+.detail-content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
 
 .berita-card {
-  background-color: #2c3930;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  width: 70%;
+  width: 90%;
+  max-width: 600px;
   margin: 0 auto;
-  height: 100%;
-  margin-bottom: 0;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
 }
 
 .detail-image {
   width: 100%;
-  height: 150px;
-  max-height: 150px;
-  border-radius: 12px;
-  margin-bottom: 0;
-}
-
-.berita-card-text {
-  padding: 14px;
-}
-
-.detail-title {
-  font-size: 12px;
-  font-weight: bold;
-  color: #ffffff;
-}
-
-/* Deskripsi */
-.detail-description {
-  padding: 0 1rem;
-}
-
-.description-label {
-  font-size: 12px;
-  color: #000;
-  margin-bottom: 8px;
-  display: block;
-}
-
-.input-image {
+  height: 350px;
+  object-fit: cover;
+  border-radius: 8px;
   cursor: pointer;
-  display: block;
-  width: 100%;
-  border-radius: 4px;
-  border: 1px solid #2c3930;
-  background-color: #2c3930;
-  color: white;
-  transition:
-    border-color 0.3s ease,
-    background-color 0.3s ease;
+}
+
+.detail-description {
+  display: flex;
+  flex-direction: column;
+  margin-top: 1rem;
+  border: none;
+  margin-left: 1.5rem;
 }
 
 .input-title {
-  font-weight: bold;
-  margin-left: 0;
-  margin-top: 0;
-  display: block;
+  font-size: 1rem;
+  font-weight: 600;
   width: 100%;
-  padding: 5px;
-  border-radius: 4px;
-  border: 1px solid #2c3930;
-  background-color: #2c3930;
-  color: white;
-  transition:
-    border-color 0.3s ease,
-    background-color 0.3s ease;
+  background-color: #fff;
+  color: #000;
+  border: none;
+  padding: 0.5rem;
 }
 
 .textarea-description {
-  padding: 8px;
-  margin-bottom: 8px;
-  border-radius: 4px;
-  border: 1px solid #8b8b8b;
-  background-color: #cdcdcd;
-  color: black;
-  transition:
-    border-color 0.3s ease,
-    background-color 0.3s ease;
-  width: 100%;
+  width: 400px;
+  font-size: 0.8rem;
+  min-height: 100px;
+  padding: 0.5rem;
+  border: none;
+  resize: vertical;
+  color: #7a7878;
 }
 
 .input-title:focus,
-.input-image:focus,
 .textarea-description:focus {
-  background-color: #ffffff;
-  color: #000;
-  border-color: #1e2a22;
+  border-radius: 6px;
   outline: none;
+  border: none;
+  background-color: #ededed;
 }
 
+/* Tombol hapus di bawah kanan */
+.detail-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: auto;
+  padding-top: 1rem;
+}
+
+/* Optional perbaikan layout */
 .save-button {
-  background-color: #2c3930;
+  background-color: #31d249;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  width: 30%;
+  font-size: 0.8rem;
+}
+
+.delete-button {
+  background-color: #e74c3c;
   color: white;
   border: none;
   padding: 10px 16px;
   border-radius: 8px;
   cursor: pointer;
-  width: 40%;
-  margin: 0 auto;
-  margin-top: 2rem;
+  font-size: 0.8rem;
+  width: 30%;
+  margin-bottom: 1rem;
 }
 
-.save-button:hover {
-  background-color: #1e2a22;
-}
 /* Desktop responsive */
 @media (min-width: 768px) {
   .dashboard {
-    height: 100%;
-    min-height: calc(100vh - 84px);
     display: flex;
     flex-direction: column;
+    height: calc(100vh - 84px);
     overflow: hidden;
   }
   .page-header {
@@ -529,7 +575,7 @@ const handleConfirmSave = async () => {
     height: 100%;
     margin-bottom: 0;
   }
-  .back-button {
+  .back-button img {
     filter: invert(1);
   }
   .app-title {
@@ -540,12 +586,12 @@ const handleConfirmSave = async () => {
     margin: 0 auto;
   }
   .main-content {
-    height: 100%;
     box-sizing: border-box;
-    min-height: calc(100vh - 73px);
+    min-height: calc(100vh - 130px);
     width: 100%;
     max-width: 800%;
     padding: 0;
+    overflow-y: auto;
   }
   .input-title {
     font-size: 1rem;
@@ -555,7 +601,7 @@ const handleConfirmSave = async () => {
   }
   .save-button {
     margin-top: 1rem;
-    width: 30%;
+    width: 15%;
   }
 }
 </style>
