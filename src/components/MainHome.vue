@@ -203,8 +203,8 @@ const handleScroll = () => {
 }
 
 onMounted(() => {
-  //fetchBerita()
-  beritaList.value = dummyBerita.slice(0, itemsPerPage)
+  fetchBerita()
+  //beritaList.value = dummyBerita.slice(0, itemsPerPage)
   contentArea.value?.addEventListener('scroll', handleScroll)
 })
 
@@ -477,7 +477,6 @@ const goBack = () => {
   margin: 0 auto;
   background-color: #fff;
   border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
 }

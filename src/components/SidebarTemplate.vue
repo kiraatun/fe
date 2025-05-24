@@ -27,7 +27,7 @@
             </div>
             <div class="sidebar-text">Kelola Laporan</div>
           </div>
-          <div class="sidebar-item" @click="goTo('uploadNews')">
+          <div class="sidebar-item" @click="goTo('upberita')">
             <div class="icon-container">
               <img src="@/assets/camera-plus.png" alt="" class="icon-img" />
             </div>

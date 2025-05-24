@@ -3,126 +3,71 @@
     <!-- Header -->
     <div class="profile-header">
       <button class="back-button" @click="goBack">
-        <img src="@/assets/arrow-left.png" alt="Back" />
+        <img src="@/assets/arrow-left.png" alt="" />
       </button>
 
-      <div class="profile-image-wrapper">
-        <input type="file" ref="fileInput" @change="onFileChange" style="display: none" />
-        <img :src="profileImage" class="profile-image" alt="Profile" />
-        <button class="edit-button" @click="$refs.fileInput.click()">
-          <img src="@/assets/edit-alt.png" alt="Edit" />
-        </button>
-      </div>
-
-      <p class="username">User</p>
-      <p class="email">{{ user.email }}</p>
+      <p class="username">{{ user.username || 'Pengguna' }}</p>
+      <p class="email">{{ user.email || 'email@gmail.com' }}</p>
     </div>
 
     <!-- Info Section -->
     <div class="profile-info">
       <div class="info-item">
         <label>Nama</label>
-        <p>{{ user.name }}</p>
+        <p>{{ user.wali || 'Nama Wali' }}</p>
       </div>
       <div class="info-item">
-        <label>NIP</label>
-        <p>{{ user.nip }}</p>
+        <label>Nama Siswa</label>
+        <p>{{ user.nama || 'Nama Siswa' }}</p>
       </div>
       <div class="info-item">
-        <label>Tahun Masuk</label>
-        <p>{{ user.entryDate }}</p>
+        <label>No Telepon</label>
+        <p>{{ user.telepon || 'No Telepon' }}</p>
+      </div>
+      <div class="info-item">
+        <label>Alamat</label>
+        <p>{{ user.alamat || 'Alamat' }}</p>
       </div>
     </div>
-
-    <BlokPopup
-      v-if="showModal"
-      title="Ganti Foto Profil"
-      message="Apakah anda yakin untuk mengganti foto profil anda?"
-      :konfirmasi="'YA'"
-      :batalkan="'BATAL'"
-      @confirm="confirmUpload"
-      @cancel="cancelUpload"
-    />
   </div>
 </template>
 
-<script>
-import BlokPopup from '@/components/BlokPopup.vue'
-import defaultImage from '@/assets/profil.jpeg'
-import { useUserStore } from '@/stores/user'
-import { computed, ref } from 'vue'
+<script setup>
+import { useRouter } from 'vue-router'
 
-export default {
-  components: {
-    BlokPopup,
-  },
-  setup() {
-    const userStore = useUserStore()
-    const showModal = ref(false)
-    const selectedFile = ref(null)
+const router = useRouter()
+const user = JSON.parse(localStorage.getItem('user') || '{}')
 
-    const profileImage = computed(() => {
-      return userStore.photoUrl || defaultImage
-    })
-
-    const fileInput = ref(null)
-
-    const onFileChange = (event) => {
-      const file = event.target.files[0]
-      if (file) {
-        selectedFile.value = file
-        showModal.value = true
-      }
-    }
-
-    const confirmUpload = () => {
-      const formData = new FormData()
-      formData.append('photo', selectedFile.value)
-
-      // Simulasi update foto sementara
-      const tempUrl = URL.createObjectURL(selectedFile.value)
-      userStore.setPhotoUrl(tempUrl)
-      showModal.value = false
-    }
-
-    const cancelUpload = () => {
-      showModal.value = false
-      selectedFile.value = null
-    }
-
-    const goBack = () => {
-      window.history.back()
-    }
-
-    return {
-      user: userStore,
-      profileImage,
-      showModal,
-      selectedFile,
-      onFileChange,
-      confirmUpload,
-      cancelUpload,
-      fileInput,
-      goBack,
-    }
-  },
+const goBack = () => {
+  router.back()
 }
 </script>
 
 <style scoped>
-.profile-container {
-  font-family: sans-serif;
-  min-height: 100vh;
-  background-color: #fff;
-  color: #000;
+.profil-container {
+  height: 100vh;
+  margin: 0;
+  padding: 0;
 }
 
 .profile-header {
   background-color: #a27b5c;
   color: #fff;
   text-align: center;
-  padding: 2rem 1rem;
+  padding: 0.8rem 0.5rem;
   position: relative;
+}
+
+.username {
+  font-weight: bold;
+  font-size: 1.3rem;
+  margin-top: 0.5rem;
+}
+
+.email {
+  font-size: 0.7rem;
+  color: #ccc;
+  margin-top: 0.2rem;
 }
 
 .back-button {
@@ -136,55 +81,16 @@ export default {
   cursor: pointer;
 }
 
-.back-button img {
-  width: 24px;
-  height: 24px;
-  filter: brightness(0) invert(1);
-}
-
-.profile-image-wrapper {
-  position: relative;
-  display: inline-block;
-}
-
-.profile-image {
-  width: 96px;
-  height: 96px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 3px solid white;
-}
-
-.edit-button {
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  background: white;
-  border: none;
-  border-radius: 50%;
-  padding: 5px;
-  cursor: pointer;
-}
-
-.edit-button img {
-  padding: 0.2rem;
-  margin: 0 auto;
-}
-
-.username {
-  font-weight: bold;
-  margin-top: 0.5rem;
-}
-
-.email {
-  font-size: 0.9rem;
-  color: #ccc;
-}
-
 .profile-info {
+  display: flex;
+  flex-direction: column;
   padding: 1rem;
-  max-width: 600px;
+  width: 100%;
   margin: auto;
+  background-color: #fff;
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 90px);
 }
 
 .info-item {
@@ -202,16 +108,6 @@ export default {
 .info-item p {
   font-weight: bold;
   margin: 0.2rem 0 0;
-}
-
-@media (min-width: 768px) {
-  .profile-header {
-    padding: 3rem 1rem;
-  }
-
-  .profile-image {
-    width: 128px;
-    height: 128px;
-  }
+  color: #000;
 }
 </style>

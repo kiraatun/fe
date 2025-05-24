@@ -23,11 +23,7 @@
           </div>
           <span>Kelola Laporan</span>
         </div>
-        <div
-          class="menu"
-          :class="{ active: route.name === 'uploadNews' }"
-          @click="goTo('uploadNews')"
-        >
+        <div class="menu" :class="{ active: route.name === 'upberita' }" @click="goTo('upberita')">
           <div class="icon-container">
             <img src="@/assets/camera-plus.png" alt="Tambah Dokumentasi" />
           </div>
@@ -148,13 +144,9 @@ async function logout() {
 onMounted(() => {
   window.addEventListener('resize', handleResize)
 
-  if (!route.name) {
+  if (route.name === 'dashboard') {
     router.replace({ name: 'home' })
   }
-
-  setTimeout(() => {
-    router.replace({ name: 'home' })
-  }, 10)
 })
 
 onBeforeUnmount(() => {

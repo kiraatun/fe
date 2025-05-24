@@ -28,7 +28,6 @@ import InformasiGuru from '@/components/InformasiGuru.vue'
 const routes = [
   { path: '/', component: WelcomePage },
   { path: '/auth', name: 'auth', component: loginPage },
-  //{ path: '/berita', name: 'home', component: MainHome }, // Home di dashboard
   { path: '/login', name: 'login', component: FormPswd },
   { path: '/profil', name: 'profil', component: ProfilView },
   { path: '/laporan', name: 'laporan', component: ReportForm },
@@ -37,19 +36,15 @@ const routes = [
     name: 'dashboard',
     component: DasboardGuru,
     children: [
-      { path: '', name: 'dashboardRoot', component: null },
       { path: 'home', name: 'home', component: MainHome },
       { path: 'upload', name: 'upload', component: LaporanView },
-      { path: 'ulpoadNews', name: 'uploadNews', component: UpNews },
+      { path: 'upberita', name: 'upberita', component: UpNews },
       { path: 'manage', name: 'manage', component: KelolaKegiatan },
       { path: 'kelas', name: 'kelas', component: TabelKelas },
       { path: 'infosiswa', name: 'infosiswa', component: InformasiSiswa },
       { path: 'infoguru', name: 'infoguru', component: InformasiGuru },
     ],
   },
-  //{ path: '/kelola/:submenu?', name: 'manage', component: ManageAct }, // Kelola Kegiatan
-  //{ path: '/unggah', name: 'uploadNews', component: UpNews }, // Unggah Berita
-  //{ path: '/kelola/add', name: 'upload', component: AddAct }, // Tambah Kegiatan
   { path: '/kelola/edit', name: 'edit', component: EditAct },
   { path: '/kelola/remove', name: 'remove', component: RemoveAct },
   { path: '/comment', name: 'comment', component: CommentTeach },
@@ -60,8 +55,6 @@ const routes = [
   { path: '/registerteach', component: RegisterTeacher },
   { path: '/registerparent', component: RegisterParent },
   { path: '/viewkegiatan', component: ViewKegiatan },
-  //{ path: '/laporanview', name: 'laporanview', component: LaporanView },
-  //{ path: '/manage', component: KelolaKegiatan },
 ]
 
 const router = createRouter({

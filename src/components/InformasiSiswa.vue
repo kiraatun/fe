@@ -586,7 +586,7 @@ function cancelSave() {
 }
 
 const goBack = () => {
-  router.back()
+  router.back('home')
 }
 </script>
 

@@ -313,7 +313,7 @@ function deleteActivity() {
 }
 
 const goBack = () => {
-  router.back()
+  router.push('home')
 }
 </script>
 
@@ -350,12 +350,13 @@ const goBack = () => {
 
 .top-bar h1 {
   margin: 0;
-  color: #2c3930;
-  font-size: 1.5rem;
+  color: #000;
+  font-size: 1.3rem;
+  font-weight: bold;
 }
 
 .add-class-button {
-  background-color: #31ce63;
+  background-color: #31d249;
   color: white;
   border: none;
   padding: 8px 16px;
@@ -365,7 +366,7 @@ const goBack = () => {
 }
 
 .add-class-button:hover {
-  background-color: #1ae04c;
+  background-color: #27c04d;
 }
 
 /* Tabs */
@@ -383,18 +384,17 @@ const goBack = () => {
   cursor: pointer;
   font-weight: bold;
   font-size: 16px;
-  color: #666;
+  color: #000;
   transition: all 0.2s;
 }
 
 .tab-button:hover {
-  background-color: #d8e3f3;
+  background-color: #e5e5e5;
 }
 
 .tab-button.active {
-  border-bottom: 3px solid #3f8efc;
-  color: #3f8efc;
-  background-color: #e5e5e5;
+  border-bottom: 3px solid #27c04d;
+  color: #27c04d;
 }
 
 .filter-bar {
@@ -482,12 +482,12 @@ const goBack = () => {
 }
 
 .modal-buttons .btn-save {
-  background-color: #31ce63;
+  background-color: #31d249;
   color: white;
 }
 
 .modal-buttons .btn-save:hover {
-  background-color: #1ae04c;
+  background-color: #27c04d;
 }
 
 .promote-button {
@@ -567,7 +567,7 @@ const goBack = () => {
 }
 
 .delete-class-button {
-  background-color: #ff5b5b;
+  background-color: #e74c3c;
   color: white;
   border: none;
   padding: 8px 16px;
