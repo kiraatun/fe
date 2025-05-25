@@ -3,10 +3,7 @@
     <div class="sidebar">
       <!-- Header profile -->
       <div class="profile-header">
-        <label class="profile-upload">
-          <img :src="profileImage" alt="User Icon" class="profile-icon" />
-        </label>
-        <span class="profile-name">{{ isLoggedIn ? userName : 'Tamu' }}</span>
+        <span class="profile-name">Smartkartika</span>
       </div>
 
       <!-- Menu -->
@@ -19,18 +16,31 @@
 
         <template v-else>
           <div class="sidebar-item" @click="goTo('/profilp')">
+            <div class="icon-container">
+              <img src="@/assets/user.png" alt="" class="icon-img" />
+            </div>
             <div class="sidebar-text">Profil</div>
           </div>
-          <div class="sidebar-item" @click="goTo('/commentp')">
-            <div class="sidebar-text">Komentar</div>
-          </div>
           <div class="sidebar-item" @click="goTo('/rapor')">
-            <div class="sidebar-text">Rapor</div>
+            <div class="icon-container">
+              <img src="@/assets/file-alt.png" alt="" class="icon-img" />
+            </div>
+            <div class="sidebar-text">Laporan Siswa</div>
           </div>
-          <div class="sidebar-item-logout" @click="goTo('/logout')">
-            <div class="sidebar-text">Logout</div>
+          <div class="sidebar-item" @click="goTo('/viewkegiatan')">
+            <div class="icon-container">
+              <img src="@/assets/edit-alt.png" alt="" class="icon-img" />
+            </div>
+            <div class="sidebar-text">Kegiatan</div>
           </div>
         </template>
+      </div>
+      <!-- Tombol logout di bawah -->
+      <div v-if="isLoggedIn" class="sidebar-item-logout" @click="logout">
+        <div class="icon-container">
+          <img src="@/assets/upload-alt.png" alt="" class="icon-img" />
+        </div>
+        <div class="sidebar-text logout">Logout</div>
       </div>
     </div>
   </div>
@@ -38,26 +48,34 @@
 
 <script setup>
 import { useRouter } from 'vue-router'
-import { computed } from 'vue'
-import { useUserStore } from '@/stores/user'
-import defaultImage from '@/assets/profil.jpeg'
 import { defineProps } from 'vue'
+import axios from 'axios'
 
 const router = useRouter()
-const userStore = useUserStore()
 
-const profileImage = computed(() => userStore.photoUrl || defaultImage)
-
-const { isLoggedIn, userName } = defineProps({
+const { isLoggedIn } = defineProps({
   isLoggedIn: {
     type: Boolean,
     required: true,
   },
-  userName: {
-    type: String,
-    default: '',
-  },
 })
+
+async function logout() {
+  try {
+    const response = await axios.post('http://localhost:8000/api/logout')
+    if (response.data.status === 'success') {
+      localStorage.removeItem('isLoggedIn')
+      localStorage.removeItem('role')
+      localStorage.removeItem('userName')
+      router.push('/login')
+    } else {
+      alert('Logout gagal dari server.')
+    }
+  } catch (error) {
+    console.error('Logout error:', error)
+    alert('Logout gagal karena koneksi atau server.')
+  }
+}
 
 function goTo(route) {
   router.push(route)
@@ -79,7 +97,7 @@ function goTo(route) {
 .sidebar {
   width: 200px;
   height: 100%;
-  background-color: #2c3930;
+  background-color: #fff;
   display: flex;
   flex-direction: column;
   box-shadow: 2px 0px 5px rgba(0, 0, 0, 0.2);
@@ -94,13 +112,16 @@ function goTo(route) {
   display: flex;
   align-items: center;
   width: 100%;
-  margin-bottom: 2rem;
+  height: 10%;
 }
 
 .sidebar-content {
   flex: 1;
-  padding-top: 20px;
+  padding-top: 10px;
   overflow-y: auto;
+  margin-top: 1rem;
+  margin-right: 0.5rem;
+  margin-left: 0.5rem;
 }
 
 .sidebar-wrapper-enter-active,
@@ -113,61 +134,83 @@ function goTo(route) {
   opacity: 0;
 }
 
-.profile-icon {
-  width: 100%;
-  height: 60px;
-  background-color: #ccc;
-  border-radius: 50%;
-  object-fit: cover;
-}
-
 .profile-name {
   color: white;
-  font-size: 20px;
+  font-size: 15px;
   font-weight: bold;
 }
 
 .sidebar-item {
-  background-color: #a27b5c;
+  background-color: #fff;
   display: flex;
   align-items: center;
-  padding: 10px 30px;
+  padding: 10px 20px;
   text-decoration: none;
-  border-bottom: 2px solid #fff;
   cursor: pointer;
+  color: #000;
+  margin-bottom: 0.7rem;
 }
 
 .sidebar-item-logout {
-  background-color: #a27b5c;
+  background-color: #d4d2d2;
   display: flex;
   align-items: center;
   padding: 10px 30px;
   text-decoration: none;
-  margin-top: 12rem;
   cursor: pointer;
+  margin: 0.5rem;
+  border-radius: 10px;
 }
 
-.sidebar-item-logout .sidebar-text img {
-  color: #fff;
-}
 .sidebar-item:hover {
-  background-color: #3b5546;
+  border-radius: 10px;
+  background-color: #cfd1d0;
 }
 
 .sidebar-item-logout:hover {
-  background-color: #3b5546;
+  background-color: #b8b8b8;
 }
 
-.icon {
-  width: 25%;
-  height: 100%;
-  margin: 0 auto;
-  filter: brightness(0) invert(1);
+.icon-container {
+  width: 20px;
+  height: 20px;
+  margin-right: 8px;
+  display: flex;
+  align-items: center;
+}
+
+.icon-container.icon {
+  margin-left: 2.4rem;
+}
+
+.icon-img {
+  width: 100%;
+  max-height: 14px;
+  object-fit: contain;
 }
 
 .sidebar-text {
-  color: #ffffff;
-  font-size: 16px;
+  color: #000;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.sidebar-text.submenu {
+  font-size: 11px;
+}
+
+.sidebar-text.logout {
   font-weight: bold;
+}
+
+.sidebar-text:hover {
+  font-weight: bold;
+}
+
+.submenu-wrapper {
+  border-left: 2px solid #93909070;
+  margin-left: 25px;
+  display: flex;
+  flex-direction: column;
 }
 </style>

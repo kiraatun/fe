@@ -1,121 +1,138 @@
 <template>
-  <div class="container">
+  <div class="laporan-container">
+    <!-- Header -->
     <div class="page-header">
       <div class="left">
         <button class="back-button" @click="goBack">
-          <img src="@/assets/arrow-left.png" alt="kembali" />
+          <img src="@/assets/arrow-left.png" alt="Kembali" />
         </button>
       </div>
       <div class="center">
-        <h1 class="app-title">Rapor</h1>
+        <h1 class="app-title">Smartkartika</h1>
       </div>
       <div class="right"></div>
     </div>
 
-    <div class="content">
-      <p class="description">Unduh e-rapot untuk untuk melihat perkembangan anak anda</p>
+    <!-- Daftar Laporan -->
+    <div class="form-laporan">
+      <h2 class="title">Daftar Laporan Siswa</h2>
+      <h2 class="title nama">{{ siswa.nama }} - {{ siswa.nis }}</h2>
 
-      <!-- Dropdown kelas & semester -->
-      <div class="option-wrapper">
-        <div class="select-group">
-          <label for="kelas">Kelas</label>
-          <select id="kelas" v-model="selectedKelas">
-            <option value="" disabled>Pilih Kelas</option>
-            <option v-for="kelas in kelasOptions" :key="kelas.id" :value="kelas.id">
-              {{ kelas.nama }}
-            </option>
-          </select>
-        </div>
-
-        <div class="select-group">
-          <label for="semester">Semester</label>
-          <select id="semester" v-model="selectedSemester">
-            <option value="" disabled>Pilih Semester</option>
-            <option v-for="smt in semesterOptions" :key="smt.id" :value="smt.id">
-              {{ smt.nama }}
-            </option>
-          </select>
-        </div>
+      <!-- Tabel -->
+      <div class="table-wrapper">
+        <table class="laporan-table">
+          <thead>
+            <tr>
+              <th>No</th>
+              <th>Kelas</th>
+              <th>Tahun Ajaran</th>
+              <th>File</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(laporan, index) in daftarLaporan" :key="index">
+              <td>{{ index + 1 }}</td>
+              <td>{{ laporan.kelas }}</td>
+              <td>{{ laporan.tahunAjaran }}</td>
+              <td>
+                <a v-if="laporan.file" :href="getFileUrl(laporan.file)" target="_blank">
+                  {{ laporan.fileName || 'Lihat File' }}
+                </a>
+                <span v-else>-</span>
+              </td>
+              <td>
+                <button class="laporan-button unduh" @click="tampilkanKonfirmasi(index)">
+                  Unduh
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
-
-      <!-- Tombol Unduh -->
-      <button class="download-button" @click="openConfirmPopup">UNDUH E-RAPOT</button>
     </div>
 
     <!-- Popup Konfirmasi -->
-    <ConfirmPopup
-      v-if="showConfirm"
-      title="UNDUH E-RAPOT"
-      message="Apakah Anda yakin ingin mengunduh e-rapot?"
+    <ConfirmModal
+      v-if="confirmUnduh"
+      :title="'Konfirmasi Unduh'"
+      :message="'Yakin ingin mengunduh laporan ini?'"
       :konfirmasi="'IYA'"
       :batalkan="'BATAL'"
-      @confirm="handleConfirm"
-      @cancel="handleCancel"
+      @confirm="konfirmasiUnduh"
+      @cancel="confirmUnduh = false"
     />
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import ConfirmPopup from '@/components/BlokPopup.vue'
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import ConfirmModal from '@/components/BlokPopup.vue'
 
 const router = useRouter()
 
-const showConfirm = ref(false)
-const selectedKelas = ref('')
-const selectedSemester = ref('')
-const kelasOptions = ref([])
-const semesterOptions = ref([])
-
-const openConfirmPopup = () => {
-  showConfirm.value = true
-}
-
-const handleConfirm = () => {
-  showConfirm.value = false
-  // Lanjutkan logika unduh e-rapot di sini
-}
-
-const handleCancel = () => {
-  showConfirm.value = false
-}
-
-// Simulasi ambil data dari backend
-const fetchKelas = async () => {
-  return [
-    { id: '1', nama: 'Kelas 1' },
-    { id: '2', nama: 'Kelas 2' },
-    { id: '3', nama: 'Kelas 3' },
-  ]
-}
-
-const fetchSemester = async () => {
-  return [
-    { id: '1', nama: 'Semester 1' },
-    { id: '2', nama: 'Semester 2' },
-  ]
-}
-
-const fetchOptions = async () => {
-  kelasOptions.value = await fetchKelas()
-  semesterOptions.value = await fetchSemester()
-}
-
-onMounted(() => {
-  fetchOptions()
+// Contoh data siswa dan laporan
+const siswa = ref({
+  nama: 'Ani',
+  nis: '001',
 })
+
+const daftarLaporan = ref([
+  {
+    kelas: '1A',
+    tahunAjaran: '2022/2023',
+    file: null,
+    fileName: 'laporan_ani.pdf',
+  },
+  {
+    kelas: '1A',
+    tahunAjaran: '2022/2023',
+    file: null,
+    fileName: 'rapor_ani_semester2.pdf',
+  },
+])
+
+const confirmUnduh = ref(false)
+const indexToUnduh = ref(null)
+
+const tampilkanKonfirmasi = (index) => {
+  indexToUnduh.value = index
+  confirmUnduh.value = true
+}
+
+const konfirmasiUnduh = () => {
+  const laporan = daftarLaporan.value[indexToUnduh.value]
+  if (laporan.file) {
+    window.open(getFileUrl(laporan.file), '_blank')
+  } else {
+    alert('File tidak tersedia.')
+  }
+  confirmUnduh.value = false
+  indexToUnduh.value = null
+}
+
+const getFileUrl = (file) => {
+  try {
+    return file ? URL.createObjectURL(file) : ''
+  } catch (e) {
+    console.error('Gagal membuat URL file:', e)
+    return ''
+  }
+}
 
 const goBack = () => {
   router.push('/dashboardortu')
 }
 </script>
 
-<style scope>
-.container {
-  height: 100vh;
+<style scoped>
+.laporan-container {
   display: flex;
   flex-direction: column;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
 }
 
 .page-header {
@@ -152,94 +169,193 @@ const goBack = () => {
   cursor: pointer;
   display: flex;
   align-items: center;
+}
+
+.back-button img {
   filter: invert(1);
 }
 
 .app-title {
   font-size: 1.3rem;
+  font-style: italic;
   font-weight: bold;
   color: #fff;
-  margin: 0 auto;
 }
 
-.content {
+.form-laporan {
   flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 1rem;
   background-color: #fff;
-  border-radius: 0;
+  padding: 1rem;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  height: 100%;
+  width: 100vw;
+  box-sizing: border-box;
+  overflow-y: auto;
 }
 
-.description {
-  font-size: 1rem;
-  font-weight: 500;
+.title {
+  text-align: start;
+  font-weight: bold;
+  color: #000;
+  font-size: 1.3rem;
+  margin-bottom: 1rem;
+}
+
+.title.nama {
   text-align: center;
-  margin-bottom: 2rem;
-  color: #333;
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
 }
 
-/* Dropdown Options */
-.option-wrapper {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
+.table-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.laporan-table {
   width: 100%;
-  max-width: 400px;
+  border-collapse: collapse;
+  background: #fff;
+  font-size: 0.85rem;
+  table-layout: fixed;
+  min-width: 1000px;
+  color: #000;
 }
 
-.select-group {
-  display: flex;
-  flex-direction: column;
-}
-
-.select-group label {
-  font-size: 0.9rem;
-  font-weight: 500;
-  margin-bottom: 0.3rem;
-  color: #444;
-}
-
-.select-group select {
-  padding: 0.5rem;
+.laporan-table th,
+.laporan-table td {
   border: 1px solid #ccc;
-  border-radius: 6px;
-  font-size: 1rem;
+  padding: 6px 8px;
+  text-align: left;
+  word-break: break-word;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: middle;
+}
+
+.laporan-table th:nth-child(1),
+.laporan-table td:nth-child(1) {
+  width: 3%;
+}
+
+.laporan-table th:nth-child(2),
+.laporan-table td:nth-child(2) {
+  width: 8%;
+}
+
+.laporan-table th:nth-child(3),
+.laporan-table td:nth-child(3) {
+  width: 10%;
+}
+
+.laporan-table th:nth-child(4),
+.laporan-table td:nth-child(4) {
+  width: 25%;
+}
+
+.laporan-table th:nth-child(5),
+.laporan-table td:nth-child(5) {
+  width: 10%;
+}
+
+.laporan-table th {
+  background-color: #f2f2f2;
+  color: #333;
+  font-weight: 600;
+}
+
+.laporan-table tr:hover {
   background-color: #f9f9f9;
 }
 
-.download-button {
-  background-color: #2e3a32;
-  color: #fff;
-  padding: 0.75rem 1.5rem;
-  font-size: 1rem;
+.laporan-button {
+  padding: 6px 12px;
+  font-size: 0.8rem;
+  background-color: #a59f9f;
+  color: white;
   border: none;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  border-radius: 6px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
-  margin-top: 3rem;
+  transition: background-color 0.2s;
+  margin: 0.2rem;
 }
 
-.download-button:hover {
-  background-color: #1f2822;
+.laporan-button.add {
+  padding: 0.4rem;
+  font-size: 0.8rem;
+  margin-bottom: 0.5rem;
 }
-/* Responsive: desktop layout kanan-kiri */
+
+.laporan-button.add,
+.laporan-button.save,
+.laporan-button.unduh {
+  background-color: #31d249;
+}
+.laporan-button.add:hover,
+.laporan-button.save:hover {
+  background-color: #27c04d;
+}
+
+.laporan-button:hover {
+  background-color: #bdbdbd;
+}
+
+.laporan-button.edit {
+  background-color: #e4cd21;
+}
+
+.laporan-button.edit:hover {
+  background-color: #fcb454;
+}
+
+.laporan-button.delete {
+  background-color: #e74c3c;
+}
+
+.laporan-button.delete:hover {
+  background-color: #d32f2f;
+}
+
 @media (min-width: 768px) {
-  .description {
-    margin-bottom: 3rem;
-  }
-  .option-wrapper {
-    flex-direction: row;
-    justify-content: center;
-    gap: 2rem;
+  .form-laporan {
+    min-height: calc(100vh - 84px);
+    max-width: 100%;
   }
 
-  .select-group {
-    width: 100%;
+  .title {
+    text-align: start;
+    font-size: 1.3rem;
+  }
+
+  .title.nama {
+    text-align: start;
+    font-size: 1rem;
+  }
+
+  .laporan-table th:nth-child(1),
+  .laporan-table td:nth-child(1) {
+    width: 2%;
+  }
+
+  .laporan-table th:nth-child(2),
+  .laporan-table td:nth-child(2) {
+    width: 5%;
+  }
+
+  .laporan-table th:nth-child(3),
+  .laporan-table td:nth-child(3) {
+    width: 7%;
+  }
+
+  .laporan-table th:nth-child(4),
+  .laporan-table td:nth-child(4) {
+    width: 20%;
+  }
+
+  .laporan-table th:nth-child(5),
+  .laporan-table td:nth-child(5) {
+    width: 7%;
   }
 }
 </style>
