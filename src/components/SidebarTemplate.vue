@@ -15,7 +15,7 @@
         </template>
 
         <template v-else>
-          <div class="sidebar-item" @click="goTo('/profil')">
+          <div class="sidebar-item" @click="goTo('profil')">
             <div class="icon-container">
               <img src="@/assets/user.png" alt="" class="icon-img" />
             </div>

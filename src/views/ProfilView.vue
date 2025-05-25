@@ -77,6 +77,10 @@ const goBack = () => {
   cursor: pointer;
 }
 
+.back-button img {
+  filter: invert(1);
+}
+
 .profile-info {
   display: flex;
   flex-direction: column;
@@ -105,5 +109,22 @@ const goBack = () => {
   font-weight: bold;
   margin: 0.2rem 0 0;
   color: #000;
+}
+
+@media (min-width: 768px) {
+  .profile-header {
+    background-color: #fff;
+  }
+  .username,
+  .email {
+    color: #000;
+  }
+  .back-button {
+    display: none;
+  }
+  .profile-info {
+    overflow: hidden;
+    height: calc(100vh - 160px);
+  }
 }
 </style>

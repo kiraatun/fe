@@ -29,7 +29,6 @@ const routes = [
   { path: '/', component: WelcomePage },
   { path: '/auth', name: 'auth', component: loginPage },
   { path: '/login', name: 'login', component: FormPswd },
-  { path: '/profil', name: 'profil', component: ProfilView },
   { path: '/laporan', name: 'laporan', component: ReportForm },
   {
     path: '/dashboard',
@@ -37,6 +36,7 @@ const routes = [
     component: DasboardGuru,
     children: [
       { path: 'home', name: 'home', component: MainHome },
+      { path: 'profil', name: 'profil', component: ProfilView },
       { path: 'upload', name: 'upload', component: LaporanView },
       { path: 'upberita', name: 'upberita', component: UpNews },
       { path: 'manage', name: 'manage', component: KelolaKegiatan },

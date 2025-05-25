@@ -17,6 +17,12 @@
           </div>
           <span>Halaman Utama</span>
         </div>
+        <div class="menu" :class="{ active: route.name === 'profil' }" @click="goTo('profil')">
+          <div class="icon-container">
+            <img src="@/assets/user.png" alt="Profil" />
+          </div>
+          <span>Profil</span>
+        </div>
         <div class="menu" :class="{ active: route.name === 'upload' }" @click="goTo('upload')">
           <div class="icon-container">
             <img src="@/assets/plus.png" alt="Tambah Laporan" />
